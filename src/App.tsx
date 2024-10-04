@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Button from '@mui/material/Button';
 
 import './App.css'
 
@@ -7,7 +8,7 @@ function App() {
   return (
     <>
       <div>
-        Hello World!
+        <Button variant="contained">Start</Button>
       </div>
     </>
   )
