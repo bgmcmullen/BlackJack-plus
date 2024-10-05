@@ -7,15 +7,50 @@ import './App.css'
 const API_URL: string | null = import.meta.env.VITE_API_URL
 
 function App() {
-  const [intructions, setIntructions] = useState('');
-  const [name, setName] = useState('');
-  const [showNameInput, setShowNameInput] = useState(false);
-  const [mainText, setMainText] = useState('');
+  const [intructions, setIntructions] = useState<string>('');
+  const [name, setName] = useState<string>('');
+  const [showNameInput, setShowNameInput] = useState<boolean>(false);
+  const [mainText, setMainText] = useState<string[]>([]);
+
+  const socket = new WebSocket('ws://localhost:8000/ws/game/');
+
+  socket.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    const type = data.type;
+    const payload = data.payload; 
+    switch (type) {
+      case 'set_instructions':
+        setIntructions(payload);
+        setShowNameInput(true);
+        break;
+      case "welcome_user":
+        setMainText([...mainText, payload]);
+        break;
+      case "print_status":
+        setMainText([...mainText, payload]);
+        break;
+
+
+    }
+     
+
+  };
+
+  // socket.onopen = function () {
+  //   socket.send(JSON.stringify({
+  //     'event': 'new_move',
+  //     'details': 'Player drew a card'
+  //   }));
+  // };
 
   async function handleStart() {
-    const response = await axios.get(`${API_URL}instructions/`);
-    setIntructions(response.data);
-    setShowNameInput(true);
+    // const response = await axios.get(`${API_URL}instructions/`);
+    socket.send(JSON.stringify({
+      'type': 'get_instructions',
+      'payload': ''
+    }));
+
+    
   }
 
   function getCookie(name: string): string | null {
@@ -32,9 +67,16 @@ function App() {
   async function handleSubmitName(event: FormEvent<HTMLInputElement>) {
     event.preventDefault();
     const csrftoken = getCookie('csrftoken');
-    const response = await axios.post(`${API_URL}set_user_name/`, {name}, 
-      {headers: {"X-CSRFTOKEN": csrftoken}, withCredentials: true});
-    setMainText(response.data);
+    // const response = await axios.post(`${API_URL}set_user_name/`, { name },
+    //   { headers: { "X-CSRFTOKEN": csrftoken }, withCredentials: true });
+    socket.send(JSON.stringify({
+      'type': 'set_name',
+      'payload': name
+    }));
+    socket.send(JSON.stringify({
+      'type': 'run',
+      'payload': ''
+    }));
   }
 
   return (
@@ -48,7 +90,11 @@ function App() {
             Submit Name
           </Button>
         </form>}
-        <p>Main text: {mainText}</p>
+        <div>
+          {
+            mainText.map((element, index) => <p key={index}>{element}</p>)
+          }
+        </div>
       </div>
     </>
   )
