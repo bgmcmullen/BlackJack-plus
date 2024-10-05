@@ -1,1 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+}
 
+.card-container {
+  display: flex;
+  gap: 10px;
+}
+
+.card {
+    width: 100px;
+    height: 150px;
+    border: 2px solid black;
+    border-radius: 10px;
+    background-color: white;
+    display: line;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px;
+    position: relative;
+    background-color: bisque;
+    box-shadow: 
+    4px 4px 7px rgba(0, 0, 0, 0.6), 
+    -2px -2px 5px rgba(255, 255, 255, .9);
+}
+
+.card .value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.card .top-left,
+.card .bottom-right {
+    position: absolute;
+    color: red;
+    font-size: 35px;
+}
+
+.card .top-left {
+    top: 5px;
+    left: 5px;
+}
+
+.card .bottom-right {
+    bottom: 5px;
+    right: 5px;
+    transform: rotate(180deg);
+}
+
+.card .suit {
+    font-size: 48px;
+    text-align: center;
+}
+
+.hearts .value, .hearts .top-left, .hearts .bottom-right,
+.diamonds .value, .diamonds .top-left, .diamonds .bottom-right, .diamonds .suit, .hearts .suit {
+    color: red;
+}
+
+.clubs .value, .clubs .top-left, .clubs .bottom-right,
+.spades .value, .spades .top-left, .spades .bottom-right {
+    color: black;
+}
