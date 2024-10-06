@@ -2,7 +2,7 @@ import { FormEvent, ChangeEvent, useState } from 'react'
 import Button from '@mui/material/Button';
 import axios from 'axios';
 
-import './App.css'
+import './App.scss'
 
 const API_URL: string | URL = import.meta.env.VITE_API_URL
 
@@ -10,8 +10,15 @@ function App() {
   const [intructions, setIntructions] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [showNameInput, setShowNameInput] = useState<boolean>(false);
-  const [mainText, setMainText] = useState<object>({});
+  const [cards, setCards] = useState<object>({
+    'computer_hidden_card_value': [],
+    'computer_visible_card_total_values': [],
+    'user_hidden_card_value': [],
+    'user_visible_card_total_values': []
+  });
   const [welcomeText, setWelcomeText] = useState<string>('');
+  const [winnerText, setWinnerText] = useState<string[]>([]);
+  const [gameOver, setGameOver] = useState<boolean>(false)
 
   const socket = new WebSocket(API_URL);
 
@@ -28,10 +35,12 @@ function App() {
         setWelcomeText(payload);
         break;
       case "print_status":
-        setMainText(payload);
+        setCards(payload);
         break;
-
-
+      case "game_end":
+        setGameOver(true);
+        setWinnerText(payload);
+        break;
     }
 
 
@@ -87,13 +96,19 @@ function App() {
     }));
   }
 
+  function handleStand() {
+    socket.send(JSON.stringify({
+      'type': 'stand',
+      'payload': ''
+    }));
+  }
+
   const suiteClasses = {
     'hearts': '♥',
     'spades': '♠',
     'diamonds': '♦',
     'clubs': '♣'
   }
-
 
   return (
     <>
@@ -109,33 +124,74 @@ function App() {
         <div>
           {welcomeText}
 
-          {
-            Object.entries(mainText).map(([key, value], indexI) => {
+          {/* <p key={`${indexI} p`}>{key}</p> */}
 
-
+          {/* {
+              value.map((card: { card_value: string; card_suite: string; }, indexJ: number) => {
+                const cardValue: string = card.card_value;
+                const cardSuite: string = card.card_suite;
+                return (
+                  key === 'computer_hidden_card_value' && !gameOver ? <div className="card card-back"></div> :
+                    <div key={`${indexI} ${indexJ} div`} className={`card ${cardSuite}`}>
+                      <div key={`${indexI} ${indexJ} divT`} className="top-left">{cardValue}</div>
+                      <div key={`${indexI} ${indexJ} divS`} className="suit">{suiteClasses[cardSuite]}</div>
+                      <div key={`${indexI} ${indexJ} divB`} className="bottom-right">{cardValue}</div>
+                    </div>)
+              })
+            } */}
+            <p>{name && `${name}'s cards:`}</p>
+          <div className="card-container">
+            {cards.user_hidden_card_value.map(card => {
               return (
-                <>
-                  <p key={`${indexI} p`}>{key}</p>
-                  <div className="card-container">
-                    {
-                      value.map((card: { card_value: string; card_suite: string; }, indexJ: number) => {
-                        console.log(card);
-                        const cardValue: string = card.card_value;
-                        const cardSuite: string = card.card_suite;
-                        return (
-                          <div key={`${indexI} ${indexJ} div`} className={`card ${cardSuite}`}>
-                            <div key={`${indexI} ${indexJ} divT`} className="top-left">{cardValue}</div>
-                            <div key={`${indexI} ${indexJ} divS`} className="suit">{suiteClasses[cardSuite]}</div>
-                            <div key={`${indexI} ${indexJ} divB`} className="bottom-right">{cardValue}</div>
-                          </div>)
-                      })
-                    }
-                  </div>
-                </>)
+                <div className={`card ${card.card_suite}`}>
+                  <div className="top-left">{card.card_value}</div>
+                  <div className="suit">{suiteClasses[card.card_suite]}</div>
+                  <div className="bottom-right">{card.card_value}</div>
+                </div>
+              )
+            })}
+            {cards.user_visible_card_total_values.map((card, index) => {
+              return (
+                <div className={`${index === 0 ? 'card-paused': 'card'} ${card.card_suite}`}>
+                  <div className="top-left">{card.card_value}</div>
+                  <div className="suit">{suiteClasses[card.card_suite]}</div>
+                  <div className="bottom-right">{card.card_value}</div>
+                </div>
+              )
             })
-          }
+            }
+          </div>
+          <p>Computers's cards:</p>
+          <div className="card-container">
+            {cards.computer_hidden_card_value.map(card => {
+              return (
+              gameOver ?
+                (<div className={`card ${card.card_suite}`}>
+                  <div className="top-left">{card.card_value}</div>
+                  <div className="suit">{suiteClasses[card.card_suite]}</div>
+                  <div className="bottom-right">{card.card_value}</div>
+                </div>) : (<div className="card  card-back"></div>)
 
-          <Button variant="contained" onClick={handleTakeACard}>Take a Card</Button>
+              )
+            })}
+            {cards.computer_visible_card_total_values.map((card, index) => {
+              return (
+                <div className={`card-paused ${card.card_suite}`}>
+                  <div className="top-left">{card.card_value}</div>
+                  <div className="suit">{suiteClasses[card.card_suite]}</div>
+                  <div className="bottom-right">{card.card_value}</div>
+                </div>
+              )
+            })
+            }
+          </div>
+
+
+
+          {winnerText.map(line => <p>{line}</p>)}
+          <Button variant="contained" onClick={handleTakeACard}>Hit</Button>
+          <Button variant="contained" onClick={handleStand}>Stand</Button>
+
         </div>
       </div>
     </>
