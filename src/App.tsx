@@ -1,4 +1,4 @@
-import { FormEvent, ChangeEvent, useState } from 'react'
+import { FormEvent, ChangeEvent, useState, useEffect } from 'react'
 import Button from '@mui/material/Button';
 import axios from 'axios';
 
@@ -7,6 +7,8 @@ import './App.scss'
 const API_URL: string | URL = import.meta.env.VITE_API_URL
 
 function App() {
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [socketOpen, setSocketOpen] = useState(false);
   const [intructions, setIntructions] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [showNameInput, setShowNameInput] = useState<boolean>(false);
@@ -19,48 +21,82 @@ function App() {
   const [welcomeText, setWelcomeText] = useState<string>('');
   const [winnerText, setWinnerText] = useState<string[]>([]);
   const [gameOver, setGameOver] = useState<boolean>(false)
-
-  const socket = new WebSocket(API_URL);
-
-  socket.onmessage = function (event) {
-    const data = JSON.parse(event.data);
-    const type = data.type;
-    const payload = data.payload;
-    switch (type) {
-      case 'set_instructions':
-        setIntructions(payload);
-        setShowNameInput(true);
-        break;
-      case "welcome_user":
-        setWelcomeText(payload);
-        break;
-      case "print_status":
-        setCards(payload);
-        break;
-      case "game_end":
-        setGameOver(true);
-        setWinnerText(payload);
-        break;
-    }
+  const [messageQueue, setMessageQueue] = useState<string[]>([])
 
 
-  };
+  // WebSocket setup
+  useEffect(() => {
+    const socketInstance = new WebSocket(API_URL);
 
-  // socket.onopen = function () {
-  //   socket.send(JSON.stringify({
-  //     'event': 'new_move',
-  //     'details': 'Player drew a card'
-  //   }));
-  // };
+    // Event listener for receiving messages
+    socketInstance.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const type = data.type;
+      const payload = data.payload;
+      switch (type) {
+        case 'set_instructions':
+          setIntructions(payload);
+          setShowNameInput(true);
+          break;
+        case "welcome_user":
+          setWelcomeText(payload);
+          break;
+        case "print_status":
+          setCards(payload);
+          break;
+        case "game_end":
+          setGameOver(true);
+          setWinnerText(payload);
+          break;
+      }
+    };
+
+    // Handle the open event and enable sending messages
+    socketInstance.addEventListener('open', () => {
+      setSocketOpen(true);
+      console.log('WebSocket connection opened.');
+    });
+
+    socketInstance.addEventListener('close', () => {
+      console.log('WebSocket connection closed.');
+    });
+
+    setSocket(socketInstance); // Store WebSocket instance
+
+    // Clean up the WebSocket on component unmount
+    return () => {
+      socketInstance.close();
+    };
+  }, []); // Run only once when component mounts
+
+  // Handle message sending with queue
+  useEffect(() => {
+    const sendMessage = async () => {
+      if (socketOpen && messageQueue.length > 0 && socket) {
+        const message = messageQueue[0]; // Get the first message in the queue
+
+        // Try sending the message
+        try {
+          socket.send(message);
+          setMessageQueue(prevMessageQueue => prevMessageQueue.slice(1)); // Remove the sent message from the queue
+        } catch (error) {
+          console.log("Failed to send message:", error);
+        }
+      }
+    };
+
+    sendMessage();
+  }, [messageQueue, socketOpen, socket]);
+
 
   async function handleStart() {
     // const response = await axios.get(`${API_URL}instructions/`);
-    socket.send(JSON.stringify({
+
+    const message = JSON.stringify({
       'type': 'get_instructions',
       'payload': ''
-    }));
-
-
+    });
+    setMessageQueue(prevMessageQueue => [...prevMessageQueue, message]);
   }
 
   function getCookie(name: string): string | null {
@@ -79,28 +115,35 @@ function App() {
     const csrftoken = getCookie('csrftoken');
     // const response = await axios.post(`${API_URL}set_user_name/`, { name },
     //   { headers: { "X-CSRFTOKEN": csrftoken }, withCredentials: true });
-    socket.send(JSON.stringify({
+    const nameMessage = JSON.stringify({
       'type': 'set_name',
       'payload': name
-    }));
-    socket.send(JSON.stringify({
+    });
+
+    setMessageQueue(prevMessageQueue => [...prevMessageQueue, nameMessage]);
+
+    const runMessage = JSON.stringify({
       'type': 'run',
       'payload': ''
-    }));
+    });
+
+    setMessageQueue(prevMessageQueue => [...prevMessageQueue, runMessage]);
   }
 
   function handleTakeACard() {
-    socket.send(JSON.stringify({
+    const takeCardMessage = JSON.stringify({
       'type': 'take_a_card',
       'payload': ''
-    }));
+    });
+    setMessageQueue(prevMessageQueue => [...prevMessageQueue, takeCardMessage]);
   }
 
   function handleStand() {
-    socket.send(JSON.stringify({
+    const standMessage = JSON.stringify({
       'type': 'stand',
       'payload': ''
-    }));
+    });
+    setMessageQueue(prevMessageQueue => [...prevMessageQueue, standMessage]);
   }
 
   const suiteClasses = {
@@ -139,7 +182,7 @@ function App() {
                     </div>)
               })
             } */}
-            <p>{name && `${name}'s cards:`}</p>
+          <p>{name && `${name}'s cards:`}</p>
           <div className="card-container">
             {cards.user_hidden_card_value.map(card => {
               return (
@@ -152,7 +195,7 @@ function App() {
             })}
             {cards.user_visible_card_total_values.map((card, index) => {
               return (
-                <div className={`${index === 0 ? 'card-paused': 'card'} ${card.card_suite}`}>
+                <div className={`${index === 0 ? 'card-paused' : 'card'} ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
                   <div className="suit">{suiteClasses[card.card_suite]}</div>
                   <div className="bottom-right">{card.card_value}</div>
@@ -165,18 +208,18 @@ function App() {
           <div className="card-container">
             {cards.computer_hidden_card_value.map(card => {
               return (
-              gameOver ?
-                (<div className={`card ${card.card_suite}`}>
-                  <div className="top-left">{card.card_value}</div>
-                  <div className="suit">{suiteClasses[card.card_suite]}</div>
-                  <div className="bottom-right">{card.card_value}</div>
-                </div>) : (<div className="card  card-back"></div>)
+                gameOver ?
+                  (<div className={`card ${card.card_suite}`}>
+                    <div className="top-left">{card.card_value}</div>
+                    <div className="suit">{suiteClasses[card.card_suite]}</div>
+                    <div className="bottom-right">{card.card_value}</div>
+                  </div>) : (<div className="card  card-back"></div>)
 
               )
             })}
             {cards.computer_visible_card_total_values.map((card, index) => {
               return (
-                <div className={`card-paused ${card.card_suite}`}>
+                <div className={`${gameOver ? "card" : "card-paused"} ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
                   <div className="suit">{suiteClasses[card.card_suite]}</div>
                   <div className="bottom-right">{card.card_value}</div>
