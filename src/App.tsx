@@ -1,10 +1,21 @@
 import { FormEvent, ChangeEvent, useState, useEffect } from 'react'
 import Button from '@mui/material/Button';
-import axios from 'axios';
 
 import './App.scss'
 
 const API_URL: string | URL = import.meta.env.VITE_API_URL
+
+interface Card {
+  card_value: string | number; 
+  card_suite: string;           
+}
+
+interface CardsState {
+  user_hidden_card_value: Card[];
+  user_visible_card_total_values: Card[];
+  computer_hidden_card_value: Card[];
+  computer_visible_card_total_values: Card[];
+}
 
 function App() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -12,7 +23,7 @@ function App() {
   const [intructions, setIntructions] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [showNameInput, setShowNameInput] = useState<boolean>(false);
-  const [cards, setCards] = useState<object>({
+  const [cards, setCards] = useState<CardsState>({
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
     'user_hidden_card_value': [],
@@ -90,7 +101,6 @@ function App() {
 
 
   async function handleStart() {
-    // const response = await axios.get(`${API_URL}instructions/`);
 
     const message = JSON.stringify({
       'type': 'get_instructions',
@@ -99,22 +109,12 @@ function App() {
     setMessageQueue(prevMessageQueue => [...prevMessageQueue, message]);
   }
 
-  function getCookie(name: string): string | null {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
-    return null;
-  }
-
   function handleChangeName(event: ChangeEvent<HTMLInputElement>) {
     setName(event.target.value);
   }
 
-  async function handleSubmitName(event: FormEvent<HTMLInputElement>) {
+  async function handleSubmitName(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const csrftoken = getCookie('csrftoken');
-    // const response = await axios.post(`${API_URL}set_user_name/`, { name },
-    //   { headers: { "X-CSRFTOKEN": csrftoken }, withCredentials: true });
     const nameMessage = JSON.stringify({
       'type': 'set_name',
       'payload': name
@@ -146,12 +146,12 @@ function App() {
     setMessageQueue(prevMessageQueue => [...prevMessageQueue, standMessage]);
   }
 
-  const suiteClasses = {
-    'hearts': '♥',
-    'spades': '♠',
-    'diamonds': '♦',
-    'clubs': '♣'
-  }
+  const suiteClasses: { [key in Card['card_suite']]: string } = {
+    hearts: '♥',
+    spades: '♠',
+    diamonds: '♦',
+    clubs: '♣',
+  };
 
   return (
     <>
@@ -217,7 +217,7 @@ function App() {
 
               )
             })}
-            {cards.computer_visible_card_total_values.map((card, index) => {
+            {cards.computer_visible_card_total_values.map((card) => {
               return (
                 <div className={`${gameOver ? "card" : "card-paused"} ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
