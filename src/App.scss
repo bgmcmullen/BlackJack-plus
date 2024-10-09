@@ -1,13 +1,37 @@
-$animation-duration: 1s;
+$animation-duration: .68s;
 $delay-step: 0.4s;
 $max-cards: 10;
 
 body {
     font-family: Arial, sans-serif;
+    background-color: #167916;
+    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.4) 20%, transparent 10%);
+    background-size: 10px 10px;
 }
+
+.deck {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background-color: red;
+    background-image: linear-gradient(45deg, red 25%, transparent 25%), 
+                      linear-gradient(-45deg, red 25%, transparent 25%), 
+                      linear-gradient(45deg, lightcoral 25%, transparent 25%), 
+                      linear-gradient(-45deg, lightcoral 25%, transparent 25%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    border-radius: 10px;
+    border: 2px solid black;
+    width: 80px;
+    height: 120px;
+    box-shadow: 
+    4px 4px 7px rgba(0, 0, 0, 0.6)
+}
+
 
 .card-container {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -25,11 +49,9 @@ body {
     position: relative;
     background-color: bisque;
     box-shadow: 
-    4px 4px 7px rgba(0, 0, 0, 0.6), 
-    -2px -2px 5px rgba(255, 255, 255, .9);
-
-    animation: flyIn $animation-duration ease-out forwards;
+    4px 4px 7px rgba(0, 0, 0, 0.6);
     visibility: hidden;
+    animation: flyIn $animation-duration ease-in-out forwards;
 }
 
 .card .value {
@@ -87,39 +109,30 @@ body {
     width: 60px;
     height: 100px;
     box-shadow: 
-    4px 4px 7px rgba(0, 0, 0, 0.6), 
-    -2px -2px 5px rgba(255, 255, 255, .9);
+    4px 4px 7px rgba(0, 0, 0, 0.6)
 }
 
-/* Animation paused card */
 .card-paused {
-    @extend .card; /* Inherit base card styles */
-    animation: flyIn $animation-duration ease-out forwards;
     visibility: hidden;
-    animation-delay: $delay-step
+    @extend .card;
+    animation: flyIn $animation-duration ease-out forwards; /* Ensure the animation is inherited */
+    animation-delay: $delay-step; /* Apply the delay */
 }
 
 @keyframes flyIn {
     0% {
         visibility: visible;
-        transform: translateX(-500px) rotate(-180deg); /* Cards start off-screen to the left */
-        opacity: 0;
+        transform: translate(var(--start-x), var(--start-y)) rotate(-180deg);
+        // opacity: 0;
     }
-    50% {
-        transform: translateX(100px) rotate(-90deg); /* Mid-flight, cards are rotating and moving right */
-        opacity: 0.5;
-        visibility: visible;
-    }
+    // 50% {
+    //     transform: translate(calc(var(--start-x) * 0.5), calc(var(--start-y) * 0.5)) rotate(-90deg);
+    //     opacity: 0.5;
+    //     visibility: visible;
+    // }
     100% {
-        transform: translateX(0) rotate(0deg); /* Cards land in their final position */
+        transform: translate(0, 0) rotate(0deg);
         opacity: 1;
         visibility: visible;
     }
 }
-
-/* Apply the staggered animation to the animated cards only */
-// @for $i from 1 through $max-cards {
-//     .card-paused:nth-child(#{$i}) {
-//       animation-delay: ($i - 1) * $delay-step;
-//     }
-// }
