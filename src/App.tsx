@@ -6,8 +6,8 @@ import './App.scss'
 const API_URL: string | URL = import.meta.env.VITE_API_URL
 
 interface Card {
-  card_value: string | number; 
-  card_suite: string;           
+  card_value: string | number;
+  card_suite: string;
 }
 
 interface CardsState {
@@ -98,6 +98,42 @@ function App() {
 
     sendMessage();
   }, [messageQueue, socketOpen, socket]);
+
+
+
+
+
+  useEffect(() => {
+
+  // Select all cards and the deck
+  const cardsOnScreen = document.querySelectorAll('.card, .card-paused');
+  const deck = document.getElementById('deck');
+
+  // Get the deck's position
+  const deckRect = deck?.getBoundingClientRect();
+
+
+    cardsOnScreen.forEach((card, index) => {
+      // Get the card's final position
+      const cardRect = card.getBoundingClientRect();
+
+      // Calculate the differences in position
+
+      console.log('card', card);
+      const startX = deckRect.left - cardRect.left;
+      const startY = deckRect.top - cardRect.top;
+
+      // Set the CSS variables for the animation
+      card.style.setProperty('--start-x', `${startX}px`);
+      card.style.setProperty('--start-y', `${startY}px`);
+
+      // Set the animation delay for staggering
+      const delay = index * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--delay-step'));
+      card.style.animationDelay = `${delay}s`;
+
+
+    });
+  }, [cards]); 
 
 
   async function handleStart() {
@@ -227,7 +263,7 @@ function App() {
             })
             }
           </div>
-
+          <div className="deck" id="deck"></div>
 
 
           {winnerText.map(line => <p>{line}</p>)}
