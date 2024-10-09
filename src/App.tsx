@@ -157,7 +157,6 @@ function App() {
     <>
       <div>
         <Button variant="contained" onClick={handleStart}>Start</Button>
-        <p>{intructions}</p>
         {showNameInput && <form onSubmit={handleSubmitName}>
           <input type="text" placeholder="Enter Your Name" onChange={handleChangeName}></input>
           <Button type="submit" variant="contained" color="primary">
@@ -204,7 +203,7 @@ function App() {
             })
             }
           </div>
-          <p>Computers's cards:</p>
+          <p>Computer's cards:</p>
           <div className="card-container">
             {cards.computer_hidden_card_value.map(card => {
               return (

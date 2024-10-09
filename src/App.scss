@@ -4,6 +4,9 @@ $max-cards: 10;
 
 body {
     font-family: Arial, sans-serif;
+    background-color: #167916; // A rich green color for the table background.
+    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.4) 20%, transparent 10%);
+    background-size: 10px 10px;
 }
 
 .card-container {
@@ -25,8 +28,7 @@ body {
     position: relative;
     background-color: bisque;
     box-shadow: 
-    4px 4px 7px rgba(0, 0, 0, 0.6), 
-    -2px -2px 5px rgba(255, 255, 255, .9);
+    4px 4px 7px rgba(0, 0, 0, 0.6);
 
     animation: flyIn $animation-duration ease-out forwards;
     visibility: hidden;
@@ -87,8 +89,7 @@ body {
     width: 60px;
     height: 100px;
     box-shadow: 
-    4px 4px 7px rgba(0, 0, 0, 0.6), 
-    -2px -2px 5px rgba(255, 255, 255, .9);
+    4px 4px 7px rgba(0, 0, 0, 0.6)
 }
 
 /* Animation paused card */
