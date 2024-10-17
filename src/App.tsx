@@ -1,4 +1,4 @@
-import { FormEvent, ChangeEvent, useState, useEffect } from 'react'
+import { FormEvent, ChangeEvent, useState, useEffect, useCallback } from 'react'
 import Button from '@mui/material/Button';
 
 import './App.scss'
@@ -20,7 +20,6 @@ interface CardsState {
 function App() {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [socketOpen, setSocketOpen] = useState(false);
-  // const [intructions, setIntructions] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [showNameInput, setShowNameInput] = useState<boolean>(false);
   const [cards, setCards] = useState<CardsState>({
@@ -31,12 +30,37 @@ function App() {
   });
   const [welcomeText, setWelcomeText] = useState<string>('');
   const [winnerText, setWinnerText] = useState<string[]>([]);
-  const [gameOver, setGameOver] = useState<boolean>(false)
-  const [messageQueue, setMessageQueue] = useState<string[]>([])
+  const [gameOver, setGameOver] = useState<boolean>(false);
+  const [messageQueue, setMessageQueue] = useState<string[]>([]);
+  const [restartButtonDisabled, setRestartButtonDisabled] = useState<boolean>(true);
+  const [nameButtonDisabled, setNameButtonDisabled] = useState<boolean>(false);
+  const [gameButtonsDisabled, setGamesButtonsDisabled] = useState<boolean>(false);
 
 
-  // WebSocket setup
-  useEffect(() => {
+
+function reset() {
+  setRestartButtonDisabled(true);
+  setSocketOpen(false);
+  setGamesButtonsDisabled(false);
+  setNameButtonDisabled(false);
+  setName('');
+  setShowNameInput(false);
+  setCards({
+    'computer_hidden_card_value': [],
+    'computer_visible_card_total_values': [],
+    'user_hidden_card_value': [],
+    'user_visible_card_total_values': []
+  });
+  setWelcomeText('');
+  setWinnerText([]);
+  setGameOver(false);
+  setMessageQueue([]);
+}
+  
+
+
+
+  const setUp = useCallback(() => {
     const socketInstance = new WebSocket(API_URL);
 
     // Event listener for receiving messages
@@ -56,11 +80,13 @@ function App() {
           setCards(payload);
           break;
         case "game_end":
+          setGamesButtonsDisabled(true);
+          setRestartButtonDisabled(false);
           setGameOver(true);
           setWinnerText(payload);
           break;
       }
-    };
+    }
 
     // Handle the open event and enable sending messages
     socketInstance.addEventListener('open', () => {
@@ -74,11 +100,23 @@ function App() {
 
     setSocket(socketInstance); // Store WebSocket instance
 
+    getInstructions();
+    return socketInstance;
+  }, []); 
+
+
+  // WebSocket setup
+  useEffect(() => {
+
+    
+    const socketInstance = setUp();
+
     // Clean up the WebSocket on component unmount
     return () => {
-      socketInstance.close();
+      if(socketInstance)
+        socketInstance.close();
     };
-  }, []); // Run only once when component mounts
+  }, [setUp]); // Run only once when component mounts
 
   // Handle message sending with queue
   useEffect(() => {
@@ -98,10 +136,6 @@ function App() {
 
     sendMessage();
   }, [messageQueue, socketOpen, socket]);
-
-
-
-
 
   useEffect(() => {
 
@@ -137,21 +171,28 @@ function App() {
   }, [cards]);
 
 
-  async function handleStart() {
+  function handleRestart() {
+    socket?.close();
+    reset();
+    setUp();
+  }
 
+  function getInstructions() {
     const message = JSON.stringify({
       'type': 'get_instructions',
       'payload': ''
     });
     setMessageQueue(prevMessageQueue => [...prevMessageQueue, message]);
+    
   }
 
   function handleChangeName(event: ChangeEvent<HTMLInputElement>) {
     setName(event.target.value);
   }
 
-  async function handleSubmitName(event: FormEvent<HTMLFormElement>) {
+  function handleSubmitName(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setNameButtonDisabled(true);
     const nameMessage = JSON.stringify({
       'type': 'set_name',
       'payload': name
@@ -193,31 +234,15 @@ function App() {
   return (
     <>
       <div>
-        <Button variant="contained" onClick={handleStart}>Start</Button>
+        <Button variant="contained" onClick={handleRestart} disabled={restartButtonDisabled}>Restart</Button>
         {showNameInput && <form onSubmit={handleSubmitName}>
           <input type="text" placeholder="Enter Your Name" onChange={handleChangeName}></input>
-          <Button type="submit" variant="contained" color="primary">
+          <Button type="submit" variant="contained" color="primary" disabled={nameButtonDisabled}>
             Submit Name
           </Button>
         </form>}
         <div>
           {welcomeText}
-
-          {/* <p key={`${indexI} p`}>{key}</p> */}
-
-          {/* {
-              value.map((card: { card_value: string; card_suite: string; }, indexJ: number) => {
-                const cardValue: string = card.card_value;
-                const cardSuite: string = card.card_suite;
-                return (
-                  key === 'computer_hidden_card_value' && !gameOver ? <div className="card card-back"></div> :
-                    <div key={`${indexI} ${indexJ} div`} className={`card ${cardSuite}`}>
-                      <div key={`${indexI} ${indexJ} divT`} className="top-left">{cardValue}</div>
-                      <div key={`${indexI} ${indexJ} divS`} className="suit">{suiteClasses[cardSuite]}</div>
-                      <div key={`${indexI} ${indexJ} divB`} className="bottom-right">{cardValue}</div>
-                    </div>)
-              })
-            } */}
           <p>{name && `${name}'s cards:`}</p>
           <div className="card-container">
             {cards.user_hidden_card_value.map(card => {
@@ -268,8 +293,8 @@ function App() {
 
 
           {winnerText.map(line => <p>{line}</p>)}
-          <Button variant="contained" onClick={handleTakeACard}>Hit</Button>
-          <Button variant="contained" onClick={handleStand}>Stand</Button>
+          <Button variant="contained" onClick={handleTakeACard} disabled={gameButtonsDisabled}>Hit</Button>
+          <Button variant="contained" onClick={handleStand} disabled={gameButtonsDisabled}>Stand</Button>
 
         </div>
       </div>
