@@ -38,29 +38,45 @@ function App() {
 
 
 
-function reset() {
-  setRestartButtonDisabled(true);
-  setSocketOpen(false);
-  setGamesButtonsDisabled(false);
-  setNameButtonDisabled(false);
-  setName('');
-  setShowNameInput(false);
-  setCards({
-    'computer_hidden_card_value': [],
-    'computer_visible_card_total_values': [],
-    'user_hidden_card_value': [],
-    'user_visible_card_total_values': []
-  });
-  setWelcomeText('');
-  setWinnerText([]);
-  setGameOver(false);
-  setMessageQueue([]);
-}
-  
+  function reset() {
+    setRestartButtonDisabled(true);
+    setSocketOpen(false);
+    setGamesButtonsDisabled(false);
+    setNameButtonDisabled(false);
+    setName('');
+    setShowNameInput(false);
+    setCards({
+      'computer_hidden_card_value': [],
+      'computer_visible_card_total_values': [],
+      'user_hidden_card_value': [],
+      'user_visible_card_total_values': []
+    });
+    setWelcomeText('');
+    setWinnerText([]);
+    setGameOver(false);
+    setMessageQueue([]);
+  }
 
+  // Create audio elements for sounds outside of the playSound function to reuse them
+  const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
+  const dealSound = new Audio('./assets/sounds/deal.wav');
+
+  // Updated playSound function
+  const playSound = (sound: HTMLAudioElement, delay: number = 0) => {
+
+    setTimeout(() => {
+      if (!sound.paused) {
+        sound.currentTime = 0; // Reset the sound if it's already playing
+      }
+      sound.play().catch((error) => {
+        console.error('Error playing sound:', error);
+      });
+    }, delay);
+  };
 
 
   const setUp = useCallback(() => {
+    playSound(shuffleSound);
     const socketInstance = new WebSocket(API_URL);
 
     // Event listener for receiving messages
@@ -77,7 +93,7 @@ function reset() {
           setWelcomeText(payload);
           break;
         case "print_status":
-          setCards(payload);
+          dealCards(payload);
           break;
         case "game_end":
           setGamesButtonsDisabled(true);
@@ -86,6 +102,27 @@ function reset() {
           setWinnerText(payload);
           break;
       }
+    }
+
+    function dealCards(newCards: CardsState) {
+
+      setCards((prevCards) => {
+        if (prevCards.user_hidden_card_value.length < newCards.user_hidden_card_value.length
+          || prevCards.user_visible_card_total_values.length < newCards.user_visible_card_total_values.length
+        ) {
+          console.log("user play");
+          playSound(dealSound);
+        }
+
+        if (prevCards.computer_hidden_card_value.length < newCards.computer_hidden_card_value.length
+          || prevCards.computer_visible_card_total_values.length < newCards.computer_visible_card_total_values.length
+        ) {
+          console.log("computer play");
+          playSound(dealSound, 400);
+        }
+        return newCards;
+      });
+
     }
 
     // Handle the open event and enable sending messages
@@ -102,18 +139,18 @@ function reset() {
 
     getInstructions();
     return socketInstance;
-  }, []); 
+  }, []);
 
 
   // WebSocket setup
   useEffect(() => {
 
-    
+
     const socketInstance = setUp();
 
     // Clean up the WebSocket on component unmount
     return () => {
-      if(socketInstance)
+      if (socketInstance)
         socketInstance.close();
     };
   }, [setUp]); // Run only once when component mounts
@@ -183,7 +220,7 @@ function reset() {
       'payload': ''
     });
     setMessageQueue(prevMessageQueue => [...prevMessageQueue, message]);
-    
+
   }
 
   function handleChangeName(event: ChangeEvent<HTMLInputElement>) {
@@ -231,6 +268,49 @@ function reset() {
     clubs: '♣',
   };
 
+  const cardBacks = document.querySelectorAll('.card-back')  as NodeListOf<HTMLElement>;
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+
+  cardBacks.forEach((card: HTMLElement, index: number) => {
+    // Assign the card index for the animation delay
+    card.style.setProperty('--card-index', index.toString());
+
+    // Randomly select one of the edges of the screen for the card to start from
+    const edge = Math.floor(Math.random() * 2); // 0 = top, 1 = right, 2 = bottom, 3 = left
+    let startX = '';
+    let startY = '';
+
+    switch (edge) {
+      case 0: // Top edge
+        startX = `-${Math.random() * windowWidth}px`;
+        startY = `-${windowHeight}px`;
+        break;
+      case 1: // Left edge
+        startX = `-${windowWidth}px`;
+        startY = `-${Math.random() * windowHeight}px`;
+        break;
+    }
+
+    // Set the CSS variables for the card's starting position
+    card.style.setProperty('--start-x', startX);
+    card.style.setProperty('--start-y', startY);
+
+    // Make the card visible
+    card.style.visibility = 'visible';
+  });
+
+
+
+  function createDeckCoordinates() {
+    const deckCoordinates: number[] = [];
+    for (let i = 0; i <= 52; i++) {
+      deckCoordinates.push(.3 * i);
+    }
+    return deckCoordinates
+  }
+  const deckCoordinates = createDeckCoordinates();
+
   return (
     <>
       <div>
@@ -242,8 +322,8 @@ function reset() {
           </Button>
         </form>}
         <div>
-          {welcomeText}
-          <p>{name && `${name}'s cards:`}</p>
+          {welcomeText && <p className='welcome-text'>{welcomeText}</p>}
+          {name && <p className='card-labels'>{`${name}'s cards:`}</p>}
           <div className="card-container">
             {cards.user_hidden_card_value.map(card => {
               return (
@@ -265,7 +345,7 @@ function reset() {
             })
             }
           </div>
-          <p>Computer's cards:</p>
+          {name && <p className='card-labels'>Computer's cards:</p>}
           <div className="card-container">
             {cards.computer_hidden_card_value.map(card => {
               return (
@@ -289,14 +369,19 @@ function reset() {
             })
             }
           </div>
-          <div className="deck" id="deck"></div>
-
-
-          {winnerText.map(line => <p>{line}</p>)}
-          <Button variant="contained" onClick={handleTakeACard} disabled={gameButtonsDisabled}>Hit</Button>
-          <Button variant="contained" onClick={handleStand} disabled={gameButtonsDisabled}>Stand</Button>
+          <div className="deck" id="deck">
+            {deckCoordinates.map((coordinate) => {
+              return (<div className="card  card-back" style={{ position: "absolute", right: `${coordinate}px`, top:`${coordinate}px`, border:"1px solid rgba(0, 0, 0, 0.5)"}}></div>)
+            })
+            }
+          </div>
 
         </div>
+        <div>
+          <Button id='button' variant="contained" onClick={handleTakeACard} disabled={gameButtonsDisabled}>Hit</Button>
+          <Button id='button' variant="contained" onClick={handleStand} disabled={gameButtonsDisabled}>Stand</Button>
+        </div>
+        {winnerText.length > 0 && <p className='card-labels'>{winnerText.map(line => <p>{line}</p>)}</p>}
       </div>
     </>
   )
