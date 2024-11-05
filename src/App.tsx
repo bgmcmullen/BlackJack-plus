@@ -35,6 +35,7 @@ function App() {
   const [restartButtonDisabled, setRestartButtonDisabled] = useState<boolean>(true);
   const [nameButtonDisabled, setNameButtonDisabled] = useState<boolean>(false);
   const [gameButtonsDisabled, setGamesButtonsDisabled] = useState<boolean>(false);
+  const [deckCoordinates, setDeckCoordinates] = useState<JSX.Element[]>([])
 
 
 
@@ -55,6 +56,7 @@ function App() {
     setWinnerText([]);
     setGameOver(false);
     setMessageQueue([]);
+    setDeckCoordinates([]);
   }
 
   // Create audio elements for sounds outside of the playSound function to reuse them
@@ -77,6 +79,7 @@ function App() {
 
   const setUp = useCallback(() => {
     playSound(shuffleSound);
+    createDeckCoordinates();
     const socketInstance = new WebSocket(API_URL);
 
     // Event listener for receiving messages
@@ -210,6 +213,7 @@ function App() {
 
   function handleRestart() {
     socket?.close();
+    createDeckCoordinates();
     reset();
     setUp();
   }
@@ -268,48 +272,66 @@ function App() {
     clubs: '♣',
   };
 
-  const cardBacks = document.querySelectorAll('.card-back')  as NodeListOf<HTMLElement>;
-  const windowWidth = window.innerWidth;
-  const windowHeight = window.innerHeight;
+  useEffect(() => {
+    if (deckCoordinates.length > 0) {
+      // Select all cards with the class 'card-back'
+      const cardBacks = document.querySelectorAll('.card-back') as NodeListOf<HTMLElement>;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
 
-  cardBacks.forEach((card: HTMLElement, index: number) => {
-    // Assign the card index for the animation delay
-    card.style.setProperty('--card-index', index.toString());
+      cardBacks.forEach((card: HTMLElement, index: number) => {
 
-    // Randomly select one of the edges of the screen for the card to start from
-    const edge = Math.floor(Math.random() * 2); // 0 = top, 1 = right, 2 = bottom, 3 = left
-    let startX = '';
-    let startY = '';
 
-    switch (edge) {
-      case 0: // Top edge
-        startX = `-${Math.random() * windowWidth}px`;
-        startY = `-${windowHeight}px`;
-        break;
-      case 1: // Left edge
-        startX = `-${windowWidth}px`;
-        startY = `-${Math.random() * windowHeight}px`;
-        break;
+        card.style.animation = 'none'; // Remove animation
+        void card.offsetHeight; // Force reflow
+        card.style.animation = ''; // Reapply animation
+
+        // Assign the card index for the animation delay
+        card.style.setProperty('--card-index', index.toString());
+
+        // Randomly select one of the edges of the screen for the card to start from
+        const edge = Math.floor(Math.random() * 2);
+        let startX = '';
+        let startY = '';
+
+        switch (edge) {
+          case 0: // Top edge
+            startX = `-${Math.random() * windowWidth}px`;
+            startY = `-${windowHeight}px`;
+            break;
+          case 1: // Left edge
+            startX = `-${windowWidth}px`;
+            startY = `-${Math.random() * windowHeight}px`;
+            break;
+        }
+
+        // Set the CSS variables for the card's starting position
+        card.style.setProperty('--start-x', startX);
+        card.style.setProperty('--start-y', startY);
+
+        // Make the card visible
+        card.style.visibility = 'visible';
+      });
     }
-
-    // Set the CSS variables for the card's starting position
-    card.style.setProperty('--start-x', startX);
-    card.style.setProperty('--start-y', startY);
-
-    // Make the card visible
-    card.style.visibility = 'visible';
-  });
+  }, [deckCoordinates]);
 
 
 
   function createDeckCoordinates() {
-    const deckCoordinates: number[] = [];
+    const newDeckCoordinates = [];
     for (let i = 0; i <= 52; i++) {
-      deckCoordinates.push(.3 * i);
+      newDeckCoordinates.push(
+        <div
+          key={i}
+          className="card card-back"
+          style={{ position: "absolute", right: `${i * 0.3}px`, top: `${i * 0.3}px`, border: "1px solid rgba(0, 0, 0, 0.5)" }}
+        ></div>
+      );
     }
-    return deckCoordinates
+    setDeckCoordinates(newDeckCoordinates); // Update the state with new coordinates
   }
-  const deckCoordinates = createDeckCoordinates();
+
+
 
   return (
     <>
@@ -370,10 +392,7 @@ function App() {
             }
           </div>
           <div className="deck" id="deck">
-            {deckCoordinates.map((coordinate) => {
-              return (<div className="card  card-back" style={{ position: "absolute", right: `${coordinate}px`, top:`${coordinate}px`, border:"1px solid rgba(0, 0, 0, 0.5)"}}></div>)
-            })
-            }
+            {deckCoordinates}
           </div>
 
         </div>
