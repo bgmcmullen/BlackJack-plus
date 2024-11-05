@@ -56,6 +56,7 @@ function App() {
     setWinnerText([]);
     setGameOver(false);
     setMessageQueue([]);
+    setDeckCoordinates([]);
   }
 
   // Create audio elements for sounds outside of the playSound function to reuse them
@@ -212,6 +213,7 @@ function App() {
 
   function handleRestart() {
     socket?.close();
+    createDeckCoordinates();
     reset();
     setUp();
   }
