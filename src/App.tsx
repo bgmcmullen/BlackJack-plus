@@ -147,7 +147,7 @@ function App() {
 
   // WebSocket setup
   useEffect(() => {
-
+    reset();
 
     const socketInstance = setUp();
 
@@ -180,7 +180,7 @@ function App() {
   useEffect(() => {
 
     // Select all cards and the deck
-    const cardsOnScreen = document.querySelectorAll('.card, .card-paused');
+    const cardsOnScreen = document.querySelectorAll('.card-back, .card-paused, .card-animated');
     const deck = document.getElementById('deck');
 
     // Get the deck's position
@@ -349,7 +349,7 @@ function App() {
           <div className="card-container">
             {cards.user_hidden_card_value.map(card => {
               return (
-                <div className={`card ${card.card_suite}`}>
+                <div className={`card-animated ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
                   <div className="suit">{suiteClasses[card.card_suite]}</div>
                   <div className="bottom-right">{card.card_value}</div>
@@ -358,7 +358,7 @@ function App() {
             })}
             {cards.user_visible_card_total_values.map((card, index) => {
               return (
-                <div className={`${index === 0 ? 'card-paused' : 'card'} ${card.card_suite}`}>
+                <div className={`${index === 0 ? 'card-paused' : 'card-animated'} ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
                   <div className="suit">{suiteClasses[card.card_suite]}</div>
                   <div className="bottom-right">{card.card_value}</div>
@@ -382,7 +382,7 @@ function App() {
             })}
             {cards.computer_visible_card_total_values.map((card) => {
               return (
-                <div className={`${gameOver ? "card" : "card-paused"} ${card.card_suite}`}>
+                <div className={`${gameOver ? "card-animated" : "card-paused"} ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
                   <div className="suit">{suiteClasses[card.card_suite]}</div>
                   <div className="bottom-right">{card.card_value}</div>

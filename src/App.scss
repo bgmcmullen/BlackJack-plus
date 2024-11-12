@@ -74,6 +74,23 @@ body {
     background-color: bisque;
     box-shadow:
         4px 4px 7px rgba(0, 0, 0, 0.6);
+}
+
+.card-animated {
+    @extend .card;
+    // width: 60px;
+    // height: 100px;
+    // border: 2px solid black;
+    // border-radius: 10px;
+    // background-color: white;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: space-between;
+    // padding: 10px;
+    // position: relative;
+    // background-color: bisque;
+    // box-shadow:
+    //     4px 4px 7px rgba(0, 0, 0, 0.6);
     visibility: hidden;
     animation: flyIn $animation-duration ease-in-out forwards;
 }
@@ -169,7 +186,7 @@ body {
 
 .card-paused {
     visibility: hidden;
-    @extend .card;
+    @extend .card-animated;
     animation: flyIn $animation-duration ease-out forwards;
     /* Ensure the animation is inherited */
     animation-delay: $delay-step;
