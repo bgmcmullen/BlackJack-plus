@@ -1,4 +1,5 @@
 $animation-duration: .5s;
+$delayed-animation-duration: .9s;
 $delay-step: 0.4s;
 $max-cards: 10;
 $deal-delay-step: .05s;
@@ -185,11 +186,10 @@ body {
 // }
 
 .card-paused {
+    @extend .card;
     visibility: hidden;
-    @extend .card-animated;
-    animation: flyIn $animation-duration ease-out forwards;
+    animation: flyInDelayed $delayed-animation-duration ease-out forwards;
     /* Ensure the animation is inherited */
-    animation-delay: $delay-step;
     /* Apply the delay */
 }
 
@@ -198,6 +198,23 @@ body {
         visibility: visible;
         transform: translate(var(--start-x), var(--start-y)) rotate(-180deg);
         // opacity: 0;
+    }
+
+
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+        visibility: visible;
+    }
+}
+@keyframes flyInDelayed {
+
+    0% {
+        visibility: hidden;
+    }
+    45% {
+        visibility: hidden;
+        transform: translate(var(--start-x), var(--start-y)) rotate(-180deg);
     }
 
 
