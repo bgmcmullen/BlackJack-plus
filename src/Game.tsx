@@ -163,7 +163,6 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   // WebSocket setup
   useEffect(() => {
     reset();
-    playSound(shuffleSound);
     const socketInstance = setUp();
 
     // Clean up the WebSocket on component unmount
@@ -228,6 +227,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
 
   function handleRestart() {
     socket?.close();
+    playSound(shuffleSound);
     createDeckCoordinates();
     reset();
     setUp();

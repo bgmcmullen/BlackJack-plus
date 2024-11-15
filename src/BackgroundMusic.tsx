@@ -13,13 +13,16 @@ const BackgroundMusic: React.FC<BackgroundMusicProps> = ({ isPlaying, volume }) 
     } else {
       stopAudio();
     }
+
+    // Clean up on component unmount
+    return () => stopAudio();
   }, [isPlaying]);
 
   useEffect(() => {
     setVolume(volume);
   }, [volume]);
 
-  return null; // No UI needed
+  return null;
 };
 
 export default BackgroundMusic;
