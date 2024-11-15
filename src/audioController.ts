@@ -1,34 +1,22 @@
-import * as Tone from 'tone';
+// audioController.js
 
-class AudioController {
-  private player: Tone.Player;
+const audioElement = document.getElementById('background-audio') as HTMLAudioElement;
 
-  constructor() {
-    this.player = new Tone.Player({
-      url: "/assets/sounds/BlackJack_soundtrack_updated.wav",
-      loop: true,
-      autostart: false,
-      volume: -12,
-    }).toDestination();
+export const playAudio = () => {
+  if (audioElement) {
+    audioElement.play();
   }
+};
 
-  play() {
-    this.player.start();
+export const stopAudio = () => {
+  if (audioElement) {
+    audioElement.pause();
+    audioElement.currentTime = 0; // Reset to start
   }
+};
 
-  stop() {
-    this.player.stop();
+export const setVolume = (volume: number) => {
+  if (audioElement) {
+    audioElement.volume = Math.max(0, Math.min(1, volume * 0.6 / 100)); // Volume between 0 and 1
   }
-
-  setVolume(volume: number) {
-    this.player.volume.value = volume;
-  }
-
-  dispose() {
-    this.player.dispose();
-  }
-}
-
-// Export a single instance (singleton pattern) to keep one consistent audio instance across the app
-const audioController = new AudioController();
-export default audioController;
+};
