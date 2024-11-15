@@ -1,5 +1,12 @@
 import { FormEvent, ChangeEvent, useState, useEffect, useCallback } from 'react'
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Slider from '@mui/material/Slider';
+import VolumeDown from '@mui/icons-material/VolumeDown';
+import VolumeUp from '@mui/icons-material/VolumeUp';
+import './App.scss';
+
 
 
 const API_URL: string | URL = import.meta.env.VITE_API_URL
@@ -17,7 +24,14 @@ interface CardsState {
   computer_visible_card_total_values: Card[];
 }
 
-function Game(props) {
+interface GameProps {
+  backgroundMusicPlaying: boolean;
+  setBackgroundMusicPlaying: (isPlaying: boolean) => void;
+  volume: number;
+  handleVolumeChange: (_event: Event, newValue: number | number[]) => void;
+}
+
+const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicPlaying, volume, handleVolumeChange }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [socketOpen, setSocketOpen] = useState(false);
   const [name, setName] = useState<string>('');
@@ -35,7 +49,7 @@ function Game(props) {
   const [restartButtonDisabled, setRestartButtonDisabled] = useState<boolean>(true);
   const [nameButtonDisabled, setNameButtonDisabled] = useState<boolean>(false);
   const [gameButtonsDisabled, setGamesButtonsDisabled] = useState<boolean>(false);
-  const [deckCoordinates, setDeckCoordinates] = useState<JSX.Element[]>([])
+  const [deckCoordinates, setDeckCoordinates] = useState<JSX.Element[]>([]);
 
 
 
@@ -234,8 +248,8 @@ function Game(props) {
 
   function handleSubmitName(event: FormEvent<HTMLFormElement>) {  
     event.preventDefault();
-    if (!props.backgroundMusicPlaying)
-      props.setBackgroundMusicPlaying(true);
+    if (!backgroundMusicPlaying)
+      setBackgroundMusicPlaying(true);
     setNameButtonDisabled(true);
     const nameMessage = JSON.stringify({
       'type': 'set_name',
@@ -338,6 +352,14 @@ function Game(props) {
 
   return (
     <>
+    <Box sx={{ width: 200 }}>
+      <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+        <VolumeDown />
+        <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+        <VolumeUp />
+      </Stack>
+
+    </Box>
       <div>
         <Button variant="contained" onClick={handleRestart} disabled={restartButtonDisabled}>Restart</Button>
         {showNameInput && <form onSubmit={handleSubmitName}>

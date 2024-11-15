@@ -1,32 +1,34 @@
-// class AudioController {
-//   private audio: HTMLAudioElement;
+import * as Tone from 'tone';
 
-//   constructor() {
-//     // Initialize audio instance only once
-//     this.audio = new Audio('/assets/sounds/BlackJack_soundtrack_updated.wav');
-//     this.audio.loop = true; // Enable looping
+class AudioController {
+  private player: Tone.Player;
 
-//     // Play the audio if allowed by browser policies
-//     document.addEventListener('click', this.initAudioPlayback);
-//   }
+  constructor() {
+    this.player = new Tone.Player({
+      url: "/assets/sounds/BlackJack_soundtrack_updated.wav",
+      loop: true,
+      autostart: false,
+      volume: -12,
+    }).toDestination();
+  }
 
-//   // Manual initialization on the first user interaction (if needed)
-//   private initAudioPlayback = () => {
-//     this.play();
-//     document.removeEventListener('click', this.initAudioPlayback); // Remove listener after initial play
-//   };
+  play() {
+    this.player.start();
+  }
 
-//   play() {
-//     if (this.audio.paused) {
-//       this.audio.play().catch((error) => console.error('Error playing audio:', error));
-//     }
-//   }
+  stop() {
+    this.player.stop();
+  }
 
-//   pause() {
-//     if (!this.audio.paused) {
-//       this.audio.pause();
-//     }
-//   }
-// }
+  setVolume(volume: number) {
+    this.player.volume.value = volume;
+  }
 
-// export default new AudioController();
+  dispose() {
+    this.player.dispose();
+  }
+}
+
+// Export a single instance (singleton pattern) to keep one consistent audio instance across the app
+const audioController = new AudioController();
+export default audioController;
