@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import audioController from './audioController';
+import { playAudio, stopAudio, setVolume } from './audioController';
 
 interface BackgroundMusicProps {
   isPlaying: boolean;
@@ -8,22 +8,15 @@ interface BackgroundMusicProps {
 
 const BackgroundMusic: React.FC<BackgroundMusicProps> = ({ isPlaying, volume }) => {
   useEffect(() => {
-    // Play or stop audio based on the isPlaying prop
     if (isPlaying) {
-      audioController.play();
+      playAudio();
     } else {
-      audioController.stop();
+      stopAudio();
     }
-
-    // Cleanup on component unmount
-    return () => {
-      audioController.stop();
-    };
   }, [isPlaying]);
 
   useEffect(() => {
-    // Set the volume whenever the volume prop changes
-    audioController.setVolume(volume * 0.6 - 60);
+    setVolume(volume);
   }, [volume]);
 
   return null; // No UI needed
