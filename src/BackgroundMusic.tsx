@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import audioController from './AudioController';
+import audioController from './audioController';
 
 interface BackgroundMusicProps {
   isPlaying: boolean;
