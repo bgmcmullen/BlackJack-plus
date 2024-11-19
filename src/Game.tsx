@@ -1,4 +1,4 @@
-import { FormEvent, ChangeEvent, useState, useEffect, useCallback } from 'react'
+import { FormEvent, ChangeEvent, useState, useReducer, useEffect, useCallback } from 'react'
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -6,6 +6,7 @@ import Slider from '@mui/material/Slider';
 import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import './App.scss';
+import playSound from './playSound';
 
 const API_URL: string | URL = import.meta.env.VITE_API_URL
 
@@ -28,67 +29,151 @@ interface GameProps {
   handleVolumeChange: (_event: Event, newValue: number | number[]) => void;
 }
 
-  // Create audio elements for sounds
-  
-  const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
-  const dealSound = new Audio('./assets/sounds/deal.wav');
+// Create audio elements for sounds
+
+const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
+const dealSound = new Audio('./assets/sounds/deal.wav');
+
+
+const initialState = {
+  socket: null as WebSocket | null,
+  socketOpen: false,
+  name: '',
+  showNameInput: true,
+  cards: {
+    computer_hidden_card_value: [],
+    computer_visible_card_total_values: [],
+    user_hidden_card_value: [],
+    user_visible_card_total_values: []
+  } as CardsState,
+  welcomeText: '',
+  winnerText: [] as string[],
+  gameOver: false,
+  messageQueue: [] as string[],
+  restartButtonDisabled: true,
+  nameButtonDisabled: false,
+  gameButtonsDisabled: false,
+  deckCoordinates: [] as JSX.Element[]
+};
+
+
+type Action =
+  | { type: 'SET_STATE'; payload: Partial<typeof initialState> }
+  | { type: 'SET_SOCKET'; payload: WebSocket | null }
+  | { type: 'SET_SOCKET_OPEN'; payload: boolean }
+  | { type: 'SET_NAME'; payload: string }
+  | { type: 'SET_SHOW_NAME_INPUT'; payload: boolean }
+  | { type: 'SET_CARDS'; payload: CardsState }
+  | { type: 'SET_WELCOME_TEXT'; payload: string }
+  | { type: 'SET_WINNER_TEXT'; payload: string[] }
+  | { type: 'SET_GAME_OVER'; payload: boolean }
+  | { type: 'SET_MESSAGE_QUEUE'; payload: string[] }
+  | { type: 'SET_RESTART_BUTTON_DISABLED'; payload: boolean }
+  | { type: 'SET_NAME_BUTTON_DISABLED'; payload: boolean }
+  | { type: 'SET_GAME_BUTTONS_DISABLED'; payload: boolean }
+  | { type: 'SET_DECK_COORDINATES'; payload: JSX.Element[] };
+
 
 
 const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicPlaying, volume, handleVolumeChange }) => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [socketOpen, setSocketOpen] = useState(false);
-  const [name, setName] = useState<string>('');
-  const [showNameInput, setShowNameInput] = useState<boolean>(true);
+  // const [socket, setSocket] = useState<WebSocket | null>(null);
+  // const [socketOpen, setSocketOpen] = useState(false);
+  // const [name, setName] = useState<string>('');
+  // const [showNameInput, setShowNameInput] = useState<boolean>(true);
   const [cards, setCards] = useState<CardsState>({
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
     'user_hidden_card_value': [],
     'user_visible_card_total_values': []
   });
-  const [welcomeText, setWelcomeText] = useState<string>('');
-  const [winnerText, setWinnerText] = useState<string[]>([]);
-  const [gameOver, setGameOver] = useState<boolean>(false);
+  // const [welcomeText, setWelcomeText] = useState<string>('');
+  // const [winnerText, setWinnerText] = useState<string[]>([]);
+  // const [gameOver, setGameOver] = useState<boolean>(false);
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
-  const [restartButtonDisabled, setRestartButtonDisabled] = useState<boolean>(true);
-  const [nameButtonDisabled, setNameButtonDisabled] = useState<boolean>(false);
-  const [gameButtonsDisabled, setGamesButtonsDisabled] = useState<boolean>(false);
-  const [deckCoordinates, setDeckCoordinates] = useState<JSX.Element[]>([]);
+  // const [restartButtonDisabled, setRestartButtonDisabled] = useState<boolean>(true);
+  // const [nameButtonDisabled, setNameButtonDisabled] = useState<boolean>(false);
+  // const [gameButtonsDisabled, setGamesButtonsDisabled] = useState<boolean>(false);
+  // const [deckCoordinates, setDeckCoordinates] = useState<JSX.Element[]>([]);
+
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+
+  function reducer(state: typeof initialState, action: Action): typeof initialState {
+    switch (action.type) {
+      case 'SET_STATE':
+        return { ...state, ...action.payload };
+      case 'SET_SOCKET':
+        return { ...state, socket: action.payload };
+      case 'SET_SOCKET_OPEN':
+        return { ...state, socketOpen: action.payload };
+      case 'SET_NAME':
+        return { ...state, name: action.payload };
+      case 'SET_SHOW_NAME_INPUT':
+        return { ...state, showNameInput: action.payload };
+      case 'SET_WELCOME_TEXT':
+        return { ...state, welcomeText: action.payload };
+      case 'SET_WINNER_TEXT':
+        return { ...state, winnerText: action.payload };
+      case 'SET_GAME_OVER':
+        return { ...state, gameOver: action.payload };
+      case 'SET_MESSAGE_QUEUE':
+        return { ...state, messageQueue: action.payload };
+      case 'SET_RESTART_BUTTON_DISABLED':
+        return { ...state, restartButtonDisabled: action.payload };
+      case 'SET_NAME_BUTTON_DISABLED':
+        return { ...state, nameButtonDisabled: action.payload };
+      case 'SET_GAME_BUTTONS_DISABLED':
+        return { ...state, gameButtonsDisabled: action.payload };
+      case 'SET_DECK_COORDINATES':
+        return { ...state, deckCoordinates: action.payload };
+      default:
+        return state;
+    }
+  }
+
 
 
 
   function reset() {
-    setRestartButtonDisabled(true);
-    setSocketOpen(false);
-    setGamesButtonsDisabled(false);
-    setNameButtonDisabled(false);
-    setName('');
-    setShowNameInput(false);
     setCards({
       'computer_hidden_card_value': [],
       'computer_visible_card_total_values': [],
       'user_hidden_card_value': [],
       'user_visible_card_total_values': []
     });
-    setWelcomeText('');
-    setWinnerText([]);
-    setGameOver(false);
-    setMessageQueue([]);
-    setDeckCoordinates([]);
-  }
-
-  // Updated playSound function
-  const playSound = (sound: HTMLAudioElement, delay: number = 0) => {
-
-    setTimeout(() => {
-      if (!sound.paused) {
-        sound.currentTime = 0; // Reset the sound if it's already playing
+    dispatch({
+      type: 'SET_STATE', payload: {
+        restartButtonDisabled: true,
+        socketOpen: false,
+        gameButtonsDisabled: false,
+        nameButtonDisabled: false,
+        name: '',
+        showNameInput: false,
+        welcomeText: '',
+        winnerText: [],
+        gameOver: false,
+        messageQueue: [],
+        deckCoordinates: []
       }
-      sound.play().catch((error) => {
-        console.error('Error playing sound:', error);
-      });
-    }, delay);
-  };
-
+    })
+    //   setRestartButtonDisabled(true);
+    //   setSocketOpen(false);
+    //   setGamesButtonsDisabled(false);
+    //   setNameButtonDisabled(false);
+    //   setName('');
+    //   setShowNameInput(false);
+    //   setCards({
+    //     'computer_hidden_card_value': [],
+    //     'computer_visible_card_total_values': [],
+    //     'user_hidden_card_value': [],
+    //     'user_visible_card_total_values': []
+    //   });
+    //   setWelcomeText('');
+    //   setWinnerText([]);
+    //   setGameOver(false);
+    //   setMessageQueue([]);
+    //   setDeckCoordinates([]);
+  }
 
   const setUp = useCallback(() => {
 
@@ -102,60 +187,78 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
       const payload = data.payload;
       switch (type) {
         case 'set_instructions':
-          // setIntructions(payload);
-          setShowNameInput(true);
+          dispatch({ type: 'SET_SHOW_NAME_INPUT', payload: true });
           break;
         case "welcome_user":
-          setWelcomeText(payload);
+          dispatch({ type: 'SET_WELCOME_TEXT', payload: payload });
           break;
         case "print_status":
           dealCards(payload);
           break;
         case "game_end":
-          setGamesButtonsDisabled(true);
-          setRestartButtonDisabled(false);
-          setGameOver(true);
-          setWinnerText(payload);
+          dispatch({
+            type: 'SET_STATE', payload: {
+              gameButtonsDisabled: true,
+              restartButtonDisabled: false,
+              gameOver: true,
+              winnerText: payload
+            }
+          })
           break;
+        }
       }
-    }
+        // switch (type) {
+        //   case 'set_instructions':
+        //     // setIntructions(payload);
+        //     setShowNameInput(true);
+        //     break;
+        //   case "welcome_user":
+        //     setWelcomeText(payload);
+        //     break;
+        //   case "print_status":
+        //     dealCards(payload);
+        //     break;
+        //   case "game_end":
+        //     setGamesButtonsDisabled(true);
+        //     setRestartButtonDisabled(false);
+        //     setGameOver(true);
+        //     setWinnerText(payload);
+        //     break;
+        // }
 
-    function dealCards(newCards: CardsState) {
+      function dealCards(newCards: CardsState) {
 
-      setCards((prevCards) => {
-        if (prevCards.user_hidden_card_value.length < newCards.user_hidden_card_value.length
-          || prevCards.user_visible_card_total_values.length < newCards.user_visible_card_total_values.length
-        ) {
-          console.log("user play");
-          playSound(dealSound);
-        }
+        setCards((prevCards) => {
+          if (prevCards.user_hidden_card_value.length < newCards.user_hidden_card_value.length
+            || prevCards.user_visible_card_total_values.length < newCards.user_visible_card_total_values.length
+          ) {
+            playSound(dealSound);
+          }
 
-        if (prevCards.computer_hidden_card_value.length < newCards.computer_hidden_card_value.length
-          || prevCards.computer_visible_card_total_values.length < newCards.computer_visible_card_total_values.length
-        ) {
-          console.log("computer play");
-          playSound(dealSound, 400);
-        }
-        return newCards;
+          if (prevCards.computer_hidden_card_value.length < newCards.computer_hidden_card_value.length
+            || prevCards.computer_visible_card_total_values.length < newCards.computer_visible_card_total_values.length
+          ) {
+            playSound(dealSound, 400);
+          }
+          return newCards;
+        });
+      }
+
+      // Handle the open event and enable sending messages
+      socketInstance.addEventListener('open', () => {
+        dispatch({ type: 'SET_SOCKET_OPEN', payload: true });
+        console.log('WebSocket connection opened.');
       });
 
-    }
+      socketInstance.addEventListener('close', () => {
+        console.log('WebSocket connection closed.');
+      });
 
-    // Handle the open event and enable sending messages
-    socketInstance.addEventListener('open', () => {
-      setSocketOpen(true);
-      console.log('WebSocket connection opened.');
-    });
+      dispatch({ type: 'SET_SOCKET', payload: socketInstance }); // Store WebSocket instance
 
-    socketInstance.addEventListener('close', () => {
-      console.log('WebSocket connection closed.');
-    });
-
-    setSocket(socketInstance); // Store WebSocket instance
-
-    getInstructions();
-    return socketInstance;
-  }, []);
+      getInstructions();
+      return socketInstance;
+    }, []);
 
 
   // WebSocket setup
@@ -173,12 +276,12 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   // Handle message sending with queue
   useEffect(() => {
     const sendMessage = async () => {
-      if (socketOpen && messageQueue.length > 0 && socket) {
+      if (state.socketOpen && messageQueue.length > 0 && state.socket) {
         const message = messageQueue[0]; // Get the first message in the queue
 
         // Try sending the message
         try {
-          socket.send(message);
+          state.socket.send(message);
           setMessageQueue(prevMessageQueue => prevMessageQueue.slice(1)); // Remove the sent message from the queue
         } catch (error) {
           console.log("Failed to send message:", error);
@@ -187,7 +290,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
     };
 
     sendMessage();
-  }, [messageQueue, socketOpen, socket]);
+  }, [messageQueue, state.socketOpen, state.socket]);
 
   useEffect(() => {
 
@@ -224,7 +327,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
 
 
   function handleRestart() {
-    socket?.close();
+    state.socket?.close();
     playSound(shuffleSound);
     createDeckCoordinates();
     reset();
@@ -241,17 +344,17 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   }
 
   function handleChangeName(event: ChangeEvent<HTMLInputElement>) {
-    setName(event.target.value);
+    dispatch({ type: 'SET_NAME', payload: event.target.value });
   }
 
-  function handleSubmitName(event: FormEvent<HTMLFormElement>) {  
+  function handleSubmitName(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!backgroundMusicPlaying)
       setBackgroundMusicPlaying(true);
-    setNameButtonDisabled(true);
+    dispatch({ type: 'SET_NAME_BUTTON_DISABLED', payload: true });
     const nameMessage = JSON.stringify({
       'type': 'set_name',
-      'payload': name
+      'payload': state.name
     });
 
     setMessageQueue(prevMessageQueue => [...prevMessageQueue, nameMessage]);
@@ -288,7 +391,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   };
 
   useEffect(() => {
-    if (deckCoordinates.length > 0) {
+    if (state.deckCoordinates.length > 0) {
       // Select all cards with the class 'card-back'
       const cardBacks = document.querySelectorAll('.card-back') as NodeListOf<HTMLElement>;
       const windowWidth = window.innerWidth;
@@ -328,7 +431,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
         card.style.visibility = 'visible';
       });
     }
-  }, [deckCoordinates]);
+  }, [state.deckCoordinates]);
 
 
 
@@ -343,32 +446,32 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
         ></div>
       );
     }
-    setDeckCoordinates(newDeckCoordinates); // Update the state with new coordinates
+    dispatch({ type: 'SET_DECK_COORDINATES', payload: newDeckCoordinates}); // Update the state with new coordinates
   }
 
 
 
   return (
     <>
-    <Box sx={{ width: 200 }}>
-      <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
-        <VolumeDown />
-        <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
-        <VolumeUp />
-      </Stack>
+      <Box sx={{ width: 200 }}>
+        <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+          <VolumeDown />
+          <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+          <VolumeUp />
+        </Stack>
 
-    </Box>
+      </Box>
       <div>
-        <Button variant="contained" onClick={handleRestart} disabled={restartButtonDisabled}>Restart</Button>
-        {showNameInput && <form onSubmit={handleSubmitName}>
+        <Button variant="contained" onClick={handleRestart} disabled={state.restartButtonDisabled}>Restart</Button>
+        {state.showNameInput && <form onSubmit={handleSubmitName}>
           <input type="text" placeholder="Enter Your Name" onChange={handleChangeName}></input>
-          <Button type="submit" variant="contained" color="primary" disabled={nameButtonDisabled}>
+          <Button type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
             Submit Name
           </Button>
         </form>}
         <div>
-          {welcomeText && <p className='welcome-text'>{welcomeText}</p>}
-          {name && <p className='card-labels'>{`${name}'s cards:`}</p>}
+          {state.welcomeText && <p className='welcome-text'>{state.welcomeText}</p>}
+          {state.name && <p className='card-labels'>{`${state.name}'s cards:`}</p>}
           <div className="card-container">
             {cards.user_hidden_card_value.map(card => {
               return (
@@ -390,11 +493,11 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
             })
             }
           </div>
-          {name && <p className='card-labels'>Computer's cards:</p>}
+          {state.name && <p className='card-labels'>Computer's cards:</p>}
           <div className="card-container">
             {cards.computer_hidden_card_value.map(card => {
               return (
-                gameOver ?
+                state.gameOver ?
                   (<div className={`card ${card.card_suite}`}>
                     <div className="top-left">{card.card_value}</div>
                     <div className="suit">{suiteClasses[card.card_suite]}</div>
@@ -405,7 +508,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
             })}
             {cards.computer_visible_card_total_values.map((card) => {
               return (
-                <div className={`${gameOver ? "card" : "card-paused"} ${card.card_suite}`}>
+                <div className={`${state.gameOver ? "card" : "card-paused"} ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
                   <div className="suit">{suiteClasses[card.card_suite]}</div>
                   <div className="bottom-right">{card.card_value}</div>
@@ -415,15 +518,15 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
             }
           </div>
           <div className="deck" id="deck">
-            {deckCoordinates}
+            {state.deckCoordinates}
           </div>
 
         </div>
         <div>
-          <Button id='button' variant="contained" onClick={handleTakeACard} disabled={gameButtonsDisabled}>Hit</Button>
-          <Button id='button' variant="contained" onClick={handleStand} disabled={gameButtonsDisabled}>Stand</Button>
+          <Button id='button' variant="contained" onClick={handleTakeACard} disabled={state.gameButtonsDisabled}>Hit</Button>
+          <Button id='button' variant="contained" onClick={handleStand} disabled={state.gameButtonsDisabled}>Stand</Button>
         </div>
-        {winnerText.length > 0 && <p className='card-labels'>{winnerText.map(line => <p>{line}</p>)}</p>}
+        {state.winnerText.length > 0 && <p className='card-labels'>{state.winnerText.map(line => <p>{line}</p>)}</p>}
       </div>
     </>
   )
