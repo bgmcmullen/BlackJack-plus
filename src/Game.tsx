@@ -7,10 +7,7 @@ import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import './App.scss';
 
-
-
 const API_URL: string | URL = import.meta.env.VITE_API_URL
-
 
 interface Card {
   card_value: string | number;
@@ -30,6 +27,12 @@ interface GameProps {
   volume: number;
   handleVolumeChange: (_event: Event, newValue: number | number[]) => void;
 }
+
+  // Create audio elements for sounds
+  
+  const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
+  const dealSound = new Audio('./assets/sounds/deal.wav');
+
 
 const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicPlaying, volume, handleVolumeChange }) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -72,11 +75,6 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
     setMessageQueue([]);
     setDeckCoordinates([]);
   }
-
-  // Create audio elements for sounds outside of the playSound function to reuse them
-  
-  const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
-  const dealSound = new Audio('./assets/sounds/deal.wav');
 
   // Updated playSound function
   const playSound = (sound: HTMLAudioElement, delay: number = 0) => {
