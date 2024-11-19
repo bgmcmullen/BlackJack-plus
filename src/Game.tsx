@@ -336,7 +336,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
 
   function createDeckCoordinates() {
     const newDeckCoordinates = [];
-    for (let i = 0; i <= 52; i++) {
+    for (let i = 0; i <= 25; i++) {
       newDeckCoordinates.push(
         <div
           key={i}
@@ -407,7 +407,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
             })}
             {cards.computer_visible_card_total_values.map((card) => {
               return (
-                <div className={`${gameOver ? "card-animated" : "card-paused"} ${card.card_suite}`}>
+                <div className={`${gameOver ? "card" : "card-paused"} ${card.card_suite}`}>
                   <div className="top-left">{card.card_value}</div>
                   <div className="suit">{suiteClasses[card.card_suite]}</div>
                   <div className="bottom-right">{card.card_value}</div>
