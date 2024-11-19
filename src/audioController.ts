@@ -1,11 +1,11 @@
 let audioContext: AudioContext;
 let audioBuffer: AudioBuffer | null;
 let sourceNode: AudioBufferSourceNode | null;
-let gainNode: AudioNode;
+let gainNode: GainNode;
 
 const initializeAudioContext = async () => {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioContext = new window.AudioContext;
     gainNode = audioContext.createGain();
     gainNode.connect(audioContext.destination);
 
@@ -54,7 +54,7 @@ export const stopAudio = () => {
   }
 };
 
-export const setVolume = (volume) => {
+export const setVolume = (volume: number) => {
   if (gainNode) {
     const currentTime = audioContext.currentTime;
     const newVolume = Math.max(0, Math.min(1, volume * 0.6 / 100));
