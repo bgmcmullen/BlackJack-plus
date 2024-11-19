@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { playAudio, stopAudio, setVolume } from './audioController';
+import { playAudio, stopAudio, setVolume } from './audioController.js';
 
 interface BackgroundMusicProps {
   isPlaying: boolean;
@@ -14,8 +14,6 @@ const BackgroundMusic: React.FC<BackgroundMusicProps> = ({ isPlaying, volume }) 
       stopAudio();
     }
 
-    // Clean up on component unmount
-    return () => stopAudio();
   }, [isPlaying]);
 
   useEffect(() => {

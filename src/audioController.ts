@@ -1,7 +1,7 @@
-let audioContext;
-let audioBuffer;
-let sourceNode;
-let gainNode;
+let audioContext: AudioContext;
+let audioBuffer: AudioBuffer | null;
+let sourceNode: AudioBufferSourceNode | null;
+let gainNode: AudioNode;
 
 const initializeAudioContext = async () => {
   if (!audioContext) {
