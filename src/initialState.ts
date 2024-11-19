@@ -1,3 +1,5 @@
+import CardsState from "./CardsState";
+
 const initialState = {
   socket: null as WebSocket | null,
   socketOpen: false,
