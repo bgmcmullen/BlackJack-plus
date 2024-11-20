@@ -32,10 +32,10 @@ function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL,
             gameButtonsDisabled: true,
             restartButtonDisabled: false,
             gameOver: true,
-            winnerText: payload.winner_text
+            winnerText: payload.winner_text,
           }
         });
-        if(payload.winner === 'user')
+        if (payload.winner === 'user')
           playSound(winnerSound);
         break;
     }

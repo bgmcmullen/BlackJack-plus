@@ -39,7 +39,6 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
     return setUpWebSocket(dispatch, API_URL, setCards, dealSound, setMessageQueue);
   }, []);
 
-
   // WebSocket setup
   useEffect(() => {
     reset(dispatch, setCards);
