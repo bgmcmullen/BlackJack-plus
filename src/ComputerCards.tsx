@@ -1,5 +1,6 @@
 import CardsState from "./CardsState";
 import Card from "./Card";
+import suiteClasses from "./suiteClasses";
 
 const ComputerCards: React.FC<{ cards: CardsState, gameOver: boolean }> = ({ cards, gameOver }) => {
   return (
@@ -8,7 +9,12 @@ const ComputerCards: React.FC<{ cards: CardsState, gameOver: boolean }> = ({ car
         return (
           gameOver ?
             (
-              <Card card={card} appearance="card" />
+              <div className={`card-flipped ${card.card_suite}`}>
+                <div className="top-left">{card.card_value}</div>
+                <div className="suit">{suiteClasses[card.card_suite]}</div>
+                <div className="bottom-right">{card.card_value}</div>
+                <div className="hidden-card-back"></div>
+              </div>
             ) : (<div className="card  card-back"></div>)
         )
       })}
