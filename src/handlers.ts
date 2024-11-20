@@ -55,7 +55,7 @@ export function handleSubmitName(
   event.preventDefault();
   if (!backgroundMusicPlaying) setBackgroundMusicPlaying(true);
   dispatch({ type: "SET_NAME_BUTTON_DISABLED", payload: true });
-
+  dispatch({ type: "SET_GAME_BUTTONS_DISABLED", payload: false });
   const nameMessage = JSON.stringify({
     type: "set_name",
     payload: state.name,

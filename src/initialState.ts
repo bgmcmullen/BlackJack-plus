@@ -17,7 +17,7 @@ const initialState = {
   messageQueue: [] as string[],
   restartButtonDisabled: true,
   nameButtonDisabled: false,
-  gameButtonsDisabled: false,
+  gameButtonsDisabled: true,
   deckCoordinates: [] as JSX.Element[]
 };
 
