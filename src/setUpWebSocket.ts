@@ -3,6 +3,9 @@ import Action from "./Action";
 import dealCards from "./dealCards";
 import CardsState from "./CardsState";
 import { handleGetInstructions } from "./handlers";
+import playSound from "./playSound";
+
+const winnerSound = new Audio('./assets/sounds/Winning-sound.wav');
 
 function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL, setCards: React.Dispatch<React.SetStateAction<CardsState>>, dealSound: HTMLAudioElement, setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>) {
   createDeckCoordinates(dispatch);
@@ -29,9 +32,11 @@ function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL,
             gameButtonsDisabled: true,
             restartButtonDisabled: false,
             gameOver: true,
-            winnerText: payload
+            winnerText: payload.winner_text
           }
-        })
+        });
+        if(payload.winner === 'user')
+          playSound(winnerSound);
         break;
     }
   }
