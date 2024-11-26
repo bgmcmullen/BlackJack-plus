@@ -108,6 +108,9 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
           <VolumeUp />
         </Stack>
       </Box>
+      <h1>
+        Target Score: {state.targetScore}
+      </h1>
       <div>
         <Button variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>Restart</Button>
         {state.showNameInput && <form onSubmit={submitName}>

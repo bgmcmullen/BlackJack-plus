@@ -17,8 +17,9 @@ function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL,
     const type = data.type;
     const payload = data.payload;
     switch (type) {
-      case 'set_instructions':
+      case 'set_target_score':
         dispatch({ type: 'SET_SHOW_NAME_INPUT', payload: true });
+        dispatch({ type: 'SET_TARGET_SCORE', payload: payload });
         break;
       case "welcome_user":
         dispatch({ type: 'SET_WELCOME_TEXT', payload: payload });
