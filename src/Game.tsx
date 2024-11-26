@@ -30,7 +30,8 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
     'user_hidden_card_value': [],
-    'user_visible_card_total_values': []
+    'user_visible_card_total_values': [],
+    'surety': 0
   });
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -98,6 +99,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   function stand() {
     handleStand(setMessageQueue);
   }
+  console.log('state.cards', state.cards)
 
   return (
     <>
@@ -110,6 +112,9 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
       </Box>
       <h1>
         Target Score: {state.targetScore}
+      </h1>
+      <h1>
+        Surety: {cards.surety}
       </h1>
       <div>
         <Button variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>Restart</Button>

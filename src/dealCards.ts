@@ -2,6 +2,7 @@ import playSound from "./playSound";
 import CardsState from "./CardsState";
 
 function dealCards(newCards: CardsState, setCards: React.Dispatch<React.SetStateAction<CardsState>>, dealSound: HTMLAudioElement) {
+  console.log("newCards", newCards);
 
   setCards((prevCards) => {
     if (prevCards.user_hidden_card_value.length < newCards.user_hidden_card_value.length

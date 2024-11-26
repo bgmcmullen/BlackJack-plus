@@ -25,6 +25,7 @@ function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL,
         dispatch({ type: 'SET_WELCOME_TEXT', payload: payload });
         break;
       case "print_status":
+        console.log(payload);
         dealCards(payload, setCards, dealSound);
         break;
       case "game_end":

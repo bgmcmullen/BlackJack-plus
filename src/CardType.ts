@@ -1,6 +1,6 @@
-interface Card {
+interface CardType {
   card_value: string | number;
   card_suite: string;
 }
 
-export default Card;
+export default CardType;
