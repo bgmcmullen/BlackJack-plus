@@ -31,7 +31,7 @@ export function handleGetInstructions(
   setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>
 ) {
   const message = JSON.stringify({
-    type: "get_instructions",
+    type: "get_target_score",
     payload: "",
   });
   setMessageQueue((prevMessageQueue) => [...prevMessageQueue, message]);
