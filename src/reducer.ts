@@ -11,6 +11,8 @@ function reducer(state: typeof initialState, action: Action): typeof initialStat
       return { ...state, socketOpen: action.payload };
     case 'SET_NAME':
       return { ...state, name: action.payload };
+    case 'SET_TARGET_SCORE':
+      return { ...state, targetScore: action.payload };
     case 'SET_SHOW_NAME_INPUT':
       return { ...state, showNameInput: action.payload };
     case 'SET_WELCOME_TEXT':
