@@ -11,7 +11,6 @@ const initialState = {
     computer_visible_card_total_values: [],
     user_hidden_card_value: [],
     user_visible_card_total_values: [], 
-    surety: 0
   } as CardsState,
   welcomeText: '',
   winnerText: [] as string[],

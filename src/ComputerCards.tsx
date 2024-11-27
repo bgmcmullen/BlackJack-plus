@@ -20,7 +20,7 @@ const ComputerCards: React.FC<{ cards: CardsState, gameOver: boolean }> = ({ car
       })}
       {cards.computer_visible_card_total_values.map((card) => {
         return (
-          <Card card={card} appearance={`${gameOver ? "card" : "card-paused"} ${card.card_suite}`} />
+          <Card card={card} appearance={`${gameOver ? "card-paused" : "card-paused"} ${card.card_suite}`} />
         )
       })
       }

@@ -6,7 +6,7 @@ import BackgroundMusic from './BackgroundMusic';
 
 function App() {
   const [backgroundMusicPlaying, setBackgroundMusicPlaying] = useState(false);
-  const [volume, setVolume] = useState<number>(80);
+  const [volume, setVolume] = useState<number>(50);
   
   const handleVolumeChange = (_event: Event, newValue: number | number[]) => {
     setVolume(newValue as number);
