@@ -3,6 +3,7 @@ import Action from "./Action";
 function createDeckCoordinates(dispatch: React.Dispatch<Action>) {
   const newDeckCoordinates = [];
   for (let i = 0; i <= 25; i++) {
+    // Build the deck of cards
     newDeckCoordinates.push(
       <div
         key={i}
@@ -11,7 +12,7 @@ function createDeckCoordinates(dispatch: React.Dispatch<Action>) {
       ></div>
     );
   }
-  dispatch({ type: 'SET_DECK_COORDINATES', payload: newDeckCoordinates}); // Update the state with new coordinates
+  dispatch({ type: 'SET_DECK_COORDINATES', payload: newDeckCoordinates});
 }
 
 export default createDeckCoordinates;

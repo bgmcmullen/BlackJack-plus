@@ -2,13 +2,19 @@ import Action from "./Action";
 import CardsState from "./CardsState";
 
 function reset(dispatch: React.Dispatch<Action>, setCards: React.Dispatch<React.SetStateAction<CardsState>>) {
+
+  // Hide game play buttons
   dispatch({ type: "SET_GAME_BUTTONS_DISABLED", payload: false });
+
+  // Clear cards
   setCards({
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
     'user_hidden_card_value': [],
     'user_visible_card_total_values': []
   });
+
+  // Reset state
   dispatch({
     type: 'SET_STATE', payload: {
       restartButtonDisabled: true,

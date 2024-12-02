@@ -61,6 +61,6 @@ export const setVolume = (volume: number) => {
 
     // Smooth volume transition
     gainNode.gain.setValueAtTime(gainNode.gain.value, currentTime);
-    gainNode.gain.linearRampToValueAtTime(newVolume, currentTime + 0.1); // Adjust duration as needed
+    gainNode.gain.linearRampToValueAtTime(newVolume, currentTime + 0.1);
   }
 };

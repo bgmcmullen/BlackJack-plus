@@ -1,0 +1,202 @@
+$animation-duration: .5s;
+$delayed-animation-duration: .9s;
+$deal-delay-step: .05s;
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Base card style*/
+@mixin card-styles {
+  width: 60px;
+  height: 100px;
+  border: 2px solid black;
+  border-radius: 10px;
+  background-color: bisque;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  position: relative;
+  box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.6);
+}
+
+/* Card without animation */
+.card {
+  @include card-styles;
+
+}
+
+/* Card with flip animation */
+.card-flipped {
+  @extend .card;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  animation: flipOver $animation-duration ease-in-out forwards;
+}
+
+/* Card with fly in animation */
+.card-animated {
+  @extend .card;
+  visibility: hidden;
+  animation: flyIn $animation-duration ease-in-out forwards;
+}
+
+/* Card with delayed fly in animation */
+.card-paused {
+  @extend .card;
+  visibility: hidden;
+  animation: flyInDelayed $delayed-animation-duration ease-out forwards;
+}
+
+/* Base style for card labels */
+.card .top-left,
+.card .bottom-right {
+  position: absolute;
+  font-size: 25px;
+}
+
+/* Style for top left label */
+.card .top-left {
+  top: 5px;
+  left: 5px;
+}
+
+/* Style for bottom right inverted label */
+.card .bottom-right {
+  bottom: 5px;
+  right: 5px;
+  transform: rotateZ(180deg);
+}
+
+/* Style for card suit label */
+.card .suit {
+  padding-top: 5px;
+  font-size: 38px;
+  text-align: center;
+}
+
+/* Red color for hearts and diamonds */
+.hearts .value,
+.hearts .top-left,
+.hearts .bottom-right,
+.diamonds .value,
+.diamonds .top-left,
+.diamonds .bottom-right,
+.diamonds .suit,
+.hearts .suit {
+  color: red;
+}
+
+/* Black color for clubs and spades */
+.clubs .value,
+.clubs .top-left,
+.clubs .bottom-right,
+.spades .value,
+.spades .top-left,
+.spades .bottom-right {
+  color: black;
+}
+
+$card-back-background-image: 
+  linear-gradient(45deg, red 25%, transparent 25%),
+  linear-gradient(-45deg, red 25%, transparent 25%),
+  linear-gradient(45deg, lightcoral 25%, transparent 25%),
+  linear-gradient(-45deg, lightcoral 25%, transparent 25%);
+$card-back-background-position: 
+  0 0, 
+  0 10px, 
+  10px -10px, 
+  -10px 0;
+
+/* Base back of card back styling */
+@mixin card-back-styles {
+  background-color: red;
+  background-image: $card-back-background-image;
+  background-size: 20px 20px;
+  background-position: $card-back-background-position;
+  border-radius: 10px;
+  border: 2px solid black;
+  width: 60px;
+  height: 100px;
+  box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.6);
+}
+
+/* Back of card styling (used for cards in deck) */
+.card-back {
+  visibility: hidden;
+  opacity: 0;
+  @include card-back-styles;
+  animation: flyToDeck $animation-duration ease-in-out forwards;
+  animation-delay: calc(var(--card-index) * $deal-delay-step);
+}
+
+/* Hidden back of card styling (used for computer hidden card) */
+.hidden-card-back { 
+  position: absolute;
+  backface-visibility: hidden;
+  top: -2px;
+  left: -2px;
+  @include card-back-styles;
+  transform: rotateY(180deg);
+  width: 100%;
+  height: 100%;
+  
+}
+
+@keyframes flyIn {
+  0% {
+      visibility: visible;
+      transform: translate(var(--start-x), var(--start-y)) rotate(-180deg);
+      // opacity: 0;
+  }
+
+  100% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 1;
+      visibility: visible;
+  }
+}
+
+@keyframes flyInDelayed {
+  0% {
+      visibility: hidden;
+  }
+
+  45% {
+      visibility: hidden;
+      transform: translate(var(--start-x), var(--start-y)) rotate(-180deg);
+  }
+
+  100% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 1;
+      visibility: visible;
+  }
+}
+
+@keyframes flyToDeck {
+  0% {
+      visibility: hidden;
+      opacity: .5;
+      transform: translate(var(--start-x), var(--start-y)) scale(1.2) rotate(0deg);
+  }
+
+  100% {
+      transform: translate(0, 0) scale(1) rotate(0deg);
+      opacity: 1;
+      visibility: visible;
+  }
+}
+
+@keyframes flipOver {
+  0% {
+      transform: rotateY(180deg);
+  }
+
+  100% {
+      transform: rotateY(0deg);
+  }
+}

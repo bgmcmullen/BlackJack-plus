@@ -27,7 +27,8 @@ export function handleRestart(
   setUp();
 }
 
-export function handleGetInstructions(
+// Request target score form server
+export function handleGetTargetScore(
   setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>
 ) {
   const message = JSON.stringify({
@@ -37,6 +38,7 @@ export function handleGetInstructions(
   setMessageQueue((prevMessageQueue) => [...prevMessageQueue, message]);
 }
 
+// Send player's name to server
 export function handleChangeName(
   event: ChangeEvent<HTMLInputElement>,
   dispatch: Dispatch<Action>
@@ -44,7 +46,7 @@ export function handleChangeName(
   dispatch({ type: "SET_NAME", payload: event.target.value });
 }
 
-export function handleSubmitName(
+export function submitNameAndStartGame(
   event: FormEvent<HTMLFormElement>,
   dispatch: Dispatch<Action>,
   state: StateType,
@@ -53,9 +55,17 @@ export function handleSubmitName(
   setBackgroundMusicPlaying: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   event.preventDefault();
+
+  // Start background music (if not already playing)
   if (!backgroundMusicPlaying) setBackgroundMusicPlaying(true);
+
+  // Hide submit name button
   dispatch({ type: "SET_NAME_BUTTON_DISABLED", payload: true });
+
+  // Show game control buttons
   dispatch({ type: "SET_GAME_BUTTONS_DISABLED", payload: false });
+
+  // Submit name to server
   const nameMessage = JSON.stringify({
     type: "set_name",
     payload: state.name,
@@ -63,6 +73,7 @@ export function handleSubmitName(
 
   setMessageQueue((prevMessageQueue) => [...prevMessageQueue, nameMessage]);
 
+  // Tell server to run the game
   const runMessage = JSON.stringify({
     type: "run",
     payload: "",
@@ -71,6 +82,7 @@ export function handleSubmitName(
   setMessageQueue((prevMessageQueue) => [...prevMessageQueue, runMessage]);
 }
 
+// Draw new card
 export function handleTakeACard(
   setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>
 ) {
@@ -81,6 +93,7 @@ export function handleTakeACard(
   setMessageQueue((prevMessageQueue) => [...prevMessageQueue, takeCardMessage]);
 }
 
+// Tell server player has chosen to stand (not take another card)
 export function handleStand(
   setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>
 ) {
