@@ -12,12 +12,14 @@ import GameProps from './GameProps';
 import initialState from './initialState';
 import reducer from './reducer';
 import reset from './reset';
-import { handleRestart, handleChangeName, handleSubmitName, handleTakeACard, handleStand } from './handlers';
+import { handleRestart, handleChangeName, submitNameAndStartGame, handleTakeACard, handleStand } from './handlers';
 import setCardAnimations from './setCardAnimations';
 import setDeckAnimation from './setDeckAnimation';
 import setUpWebSocket from './setUpWebSocket';
 import UserCards from './UserCards';
 import ComputerCards from './ComputerCards';
+
+import './Game.scss';
 
 const API_URL: string | URL = import.meta.env.VITE_API_URL
 
@@ -35,11 +37,12 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
 
+
+  // setup WebSocket 
   const setUp = useCallback(() => {
     return setUpWebSocket(dispatch, API_URL, setCards, dealSound, setMessageQueue);
   }, []);
 
-  // WebSocket setup
   useEffect(() => {
     reset(dispatch, setCards);
     const socketInstance = setUp();
@@ -49,7 +52,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
       if (socketInstance)
         socketInstance.close();
     };
-  }, [setUp]); // Run only once when component mounts
+  }, [setUp]);
 
   // Handle message sending with queue
   useEffect(() => {
@@ -88,7 +91,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   }
 
   function submitName(event: FormEvent<HTMLFormElement>) {
-    handleSubmitName(event, dispatch, state, setMessageQueue, backgroundMusicPlaying, setBackgroundMusicPlaying)
+    submitNameAndStartGame(event, dispatch, state, setMessageQueue, backgroundMusicPlaying, setBackgroundMusicPlaying)
   }
 
   function takeACard() {
@@ -101,6 +104,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
 
   return (
     <>
+    {/* Volume control */}
       <Box sx={{ width: 200 }}>
         <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
           <VolumeDown />
@@ -108,9 +112,12 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
           <VolumeUp />
         </Stack>
       </Box>
+
       <h1>
         Target Score: {state.targetScore}
       </h1>
+
+      {/* Name submission */}
       <div>
         <Button variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>Restart</Button>
         {state.showNameInput && <form onSubmit={submitName}>
@@ -119,21 +126,38 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
             Submit Name
           </Button>
         </form>}
+
+
         <div>
+          {/* Welcome text */}
           {state.welcomeText && <p className='welcome-text'>{state.welcomeText}</p>}
+
+          {/* User card label */}
           {state.name && <p className='card-labels'>{`${state.name}'s cards:`}</p>}
+
+          {/* User cards */}
           <UserCards cards={cards}/>
+
+          {/* Computer card label */}
           {state.name && <p className='card-labels'>Computer's cards:</p>}
+
+          {/* Computer cards */}
           <ComputerCards cards={cards} gameOver={state.gameOver} />
+
+          {/* Display deck */}
           <div className="deck" id="deck">
             {state.deckCoordinates}
           </div>
 
         </div>
+
+        {/* Game control buttons */}
         <div>
           <Button id='button' variant="contained" onClick={takeACard} disabled={state.gameButtonsDisabled}>Hit</Button>
           <Button id='button' variant="contained" onClick={stand} disabled={state.gameButtonsDisabled}>Stand</Button>
         </div>
+
+        {/* Winner text */}
         {state.winnerText.length > 0 && <p className='card-labels'>{state.winnerText.map(line => <p>{line}</p>)}</p>}
       </div>
     </>

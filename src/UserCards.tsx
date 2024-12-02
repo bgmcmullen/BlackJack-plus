@@ -10,9 +10,12 @@ const UserCards: React.FC<{ cards: CardsState }> = ({ cards }) => {
           <Card card={card} appearance="card-animated"/>
         )
       })}
+
       {cards.user_visible_card_total_values.map((card, index) => {
         return (
-          <Card card={card} appearance={`${index === 0 ? 'card-paused' : 'card-animated'} ${card.card_suite}`}/>
+
+          // Set first card to paused animation
+          <Card card={card} appearance={`${index === 0 ? 'card-paused' : 'card-animated'}`}/>
         )
       })
       }

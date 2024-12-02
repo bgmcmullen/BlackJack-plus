@@ -2,6 +2,7 @@ import initialState from "./initialState";
 
 function setDeckAnimation(state: typeof initialState) {
   if (state.deckCoordinates.length > 0) {
+    
     // Select all cards with the class 'card-back'
     const cardBacks = document.querySelectorAll('.card-back') as NodeListOf<HTMLElement>;
     const windowWidth = window.innerWidth;
@@ -11,13 +12,13 @@ function setDeckAnimation(state: typeof initialState) {
 
 
       card.style.animation = 'none'; // Remove animation
-      void card.offsetHeight; // Force reflow
+      void card.offsetHeight;
       card.style.animation = ''; // Reapply animation
 
       // Assign the card index for the animation delay
       card.style.setProperty('--card-index', index.toString());
 
-      // Randomly select one of the edges of the screen for the card to start from
+      // Randomly select top or left of the screen for the card to start from
       const edge = Math.floor(Math.random() * 2);
       let startX = '';
       let startY = '';
