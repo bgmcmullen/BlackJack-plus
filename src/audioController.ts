@@ -9,6 +9,7 @@ const initializeAudioContext = async () => {
     gainNode = audioContext.createGain();
     gainNode.connect(audioContext.destination);
 
+    // fetch audio file
     const response = await fetch('/assets/sounds/BlackJack_soundtrack_updated.wav');
     const arrayBuffer = await response.arrayBuffer();
     audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
