@@ -11,7 +11,6 @@ function setCardAnimations() {
     const cardRect = cardElement.getBoundingClientRect();
 
     // Calculate the differences in position
-
     if (!deckRect)
       return;
     const startX = deckRect.left - cardRect.left;
