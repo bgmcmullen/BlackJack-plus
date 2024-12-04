@@ -7,60 +7,88 @@ import playSound from "./playSound";
 
 const winnerSound = new Audio('./assets/sounds/Winning-sound.wav');
 
-function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL, setCards: React.Dispatch<React.SetStateAction<CardsState>>, dealSound: HTMLAudioElement, setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>) {
+function setUpWebSocket(
+  dispatch: React.Dispatch<Action>,
+  API_URL: string | URL,
+  setCards: React.Dispatch<React.SetStateAction<CardsState>>,
+  dealSound: HTMLAudioElement,
+  setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>,
+  retryInterval = 500
+) {
   createDeckCoordinates(dispatch);
-  const socketInstance = new WebSocket(API_URL);
 
-  // Event listener for receiving messages
-  socketInstance.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    const type = data.type;
-    const payload = data.payload;
+  let socketInstance: WebSocket | null = null;
 
-    switch (type) {
-      case 'set_target_score':
-        dispatch({ type: 'SET_SHOW_NAME_INPUT', payload: true });
-        dispatch({ type: 'SET_TARGET_SCORE', payload: payload });
-        break;
+  const connectWebSocket = () => {
+    socketInstance = new WebSocket(API_URL);
 
-      case "welcome_user":
-        dispatch({ type: 'SET_WELCOME_TEXT', payload: payload });
-        break;
+    // Event listener for receiving messages
+    socketInstance.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const type = data.type;
+      const payload = data.payload;
 
-      case "set_card_status":
-        dealCards(payload, setCards, dealSound);
-        break;
+      switch (type) {
+        case 'set_target_score':
+          dispatch({ type: 'SET_SHOW_NAME_INPUT', payload: true });
+          dispatch({ type: 'SET_TARGET_SCORE', payload: payload });
+          break;
 
-      case "game_end":
-        dispatch({
-          type: 'SET_STATE', payload: {
-            gameButtonsDisabled: true,
-            restartButtonDisabled: false,
-            gameOver: true,
-            winnerText: payload.winner_text,
-          }
-        });
+        case "welcome_user":
+          dispatch({ type: 'SET_WELCOME_TEXT', payload: payload });
+          break;
 
-        // If user won play winning fanfare
-        if (payload.winner === 'user')
-          playSound(winnerSound);
-        break;
-    }
-  }
+        case "set_card_status":
+          dealCards(payload, setCards, dealSound);
+          break;
 
-  // Handle the open event and enable sending messages
-  socketInstance.addEventListener('open', () => {
-    dispatch({ type: 'SET_SOCKET_OPEN', payload: true });
-    console.log('WebSocket connection opened.');
-  });
+        case "game_end":
+          dispatch({
+            type: 'SET_STATE',
+            payload: {
+              gameButtonsDisabled: true,
+              restartButtonDisabled: false,
+              gameOver: true,
+              winnerText: payload.winner_text,
+            }
+          });
 
-  socketInstance.addEventListener('close', () => {
-    console.log('WebSocket connection closed.');
-  });
+          // If user won, play winning fanfare
+          if (payload.winner === 'user') playSound(winnerSound);
+          break;
+      }
+    };
 
-  dispatch({ type: 'SET_SOCKET', payload: socketInstance }); // Store WebSocket instance
+    // Handle the open event and enable sending messages
+    socketInstance.addEventListener('open', () => {
+      dispatch({ type: 'SET_SOCKET_OPEN', payload: true });
+      console.log('WebSocket connection opened.');
+    });
 
-  handleGetTargetScore(setMessageQueue);
+    // Handle the close event and attempt to reconnect
+    socketInstance.addEventListener('close', () => {
+      console.log('WebSocket connection closed. Attempting to reconnect...');
+      dispatch({ type: 'SET_SOCKET_OPEN', payload: false });
+
+      // Retry connection after a delay
+      setTimeout(() => {
+        connectWebSocket();
+      }, retryInterval);
+    });
+
+    // Handle error events
+    socketInstance.addEventListener('error', (error) => {
+      console.error('WebSocket error:', error);
+      socketInstance?.close();
+    });
+
+    // Store WebSocket instance in the state
+    dispatch({ type: 'SET_SOCKET', payload: socketInstance });
+
+    handleGetTargetScore(setMessageQueue);
+  };
+
+  connectWebSocket();
   return socketInstance;
 }
 
