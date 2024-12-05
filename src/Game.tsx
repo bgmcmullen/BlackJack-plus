@@ -164,4 +164,4 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   )
 }
 
-export default Game
+export default Game;
