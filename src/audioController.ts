@@ -34,7 +34,7 @@ export const playAudio = async () => {
   // Fade in smoothly
   const currentTime = audioContext.currentTime;
   gainNode.gain.setValueAtTime(0, currentTime);
-  gainNode.gain.linearRampToValueAtTime(1, currentTime + 1); // 1 second fade-in
+  gainNode.gain.linearRampToValueAtTime(.25, currentTime + 1); // 1 second fade-in
 
   sourceNode.start(0);
 };
@@ -54,6 +54,8 @@ export const stopAudio = () => {
     sourceNode = null;
   }
 };
+
+
 
 export const setVolume = (volume: number) => {
   if (gainNode) {

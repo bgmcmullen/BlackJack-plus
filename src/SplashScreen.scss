@@ -3,17 +3,46 @@
   justify-content: center;
 }
 
+img {
+  position: absolute;
+}
+
+.card-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.king1 {
+  transform: scale(.75) translate(50%, -10%);
+  z-index: 2;
+}
+.ace1 {
+  transform: scale(.75) translate(-18%, -18%);
+  z-index: 1;
+}
+.ace2 {
+  transform: scale(.75) translate(25%, -25%);
+}
+.card1 {
+  transform: scale(.75) translate(-90%, 15%);
+}
+.jack1 {
+  transform: scale(.75) translate(0%, -22%);
+}
 
 .start-button {
   position: relative;
   overflow: hidden;
   display: inline-flex;
-  padding: 27px 117px;
+  padding: 17px 80px;
   align-items: center;
   gap: 10px;
-  border-radius: 40px;
+  border-radius: 28px;
   background: linear-gradient(90deg, #232171 0.03%, #272731 130.83%);
-  box-shadow: 0px 0px 5.7px 0px rgba(0, 0, 0, 0.25);
+  box-shadow: 8px 8px 4px rgba(0, 0, 0, .75);
+  z-index: 5;
 }
 
 .start-button::before {
@@ -30,7 +59,7 @@
   opacity: 1;
 }
 
-.start-button > * {
+.start-button>* {
   position: relative;
   z-index: 1;
 }

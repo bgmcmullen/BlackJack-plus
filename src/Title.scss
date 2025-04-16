@@ -2,9 +2,11 @@
 
 .main-title-text {
   position: absolute;
-  font-size: clamp(32px, 15vw, 128px);
+  font-size: clamp(32px, 15vw, 112px);
   font-weight: 700;
   font-family: "Inknut Antiqua";
+  margin: 0;
+  padding: 0;
 }
 
 #sparkle-large {
@@ -43,7 +45,7 @@
 }
 
 .main-title-div {
-  height: 500px;
+  height: 300px;
   position: relative;
   width: 100%;
   display: flex;

@@ -27,7 +27,7 @@ const API_URL: string | URL = import.meta.env.VITE_API_URL
 const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
 const dealSound = new Audio('./assets/sounds/deal.wav');
 
-const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicPlaying, volume, handleVolumeChange }) => {
+const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolumeChange }) => {
   const [cards, setCards] = useState<CardsState>({
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
