@@ -14,7 +14,7 @@ const SplashScreen: React.FC<{ setGameStarted: React.Dispatch<React.SetStateActi
           <img src='public/assets/images/start.svg' />
         </div>
       </div>
-      <div className='card-container'>
+      <div className='title-card-container '>
         <img className='king1' src='public/assets/images/King1.png' />
         <img className='ace1' src='public/assets/images/ace1.png' />
         <img className='ace2' src='public/assets/images/ace2.png' />

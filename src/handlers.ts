@@ -51,13 +51,9 @@ export function submitNameAndStartGame(
   dispatch: Dispatch<Action>,
   state: StateType,
   setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>,
-  backgroundMusicPlaying: boolean,
-  setBackgroundMusicPlaying: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   event.preventDefault();
 
-  // Start background music (if not already playing)
-  if (!backgroundMusicPlaying) setBackgroundMusicPlaying(true);
 
   // Hide submit name button
   dispatch({ type: "SET_NAME_BUTTON_DISABLED", payload: true });

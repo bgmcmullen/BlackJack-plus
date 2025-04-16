@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import './App.scss';
 import Game from './Game';
 import SplashScreen from './SplashScreen';
@@ -17,7 +17,6 @@ function App() {
 
   return (
     <>
-
       {!gameStarted ? <SplashScreen setGameStarted={setGameStarted} setBackgroundMusicPlaying={setBackgroundMusicPlaying} /> :
         <>
           <Game backgroundMusicPlaying={backgroundMusicPlaying} volume={volume} handleVolumeChange={handleVolumeChange} />

@@ -28,7 +28,7 @@ const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
 const dealSound = new Audio('./assets/sounds/deal.wav');
 
 const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolumeChange }) => {
-  const [cards, setCards] = useState<CardsState>({
+  const [cards, setCards] = useState<CardsState>(JSON.parse(localStorage.getItem("Blackjack_Cards") || "") || {
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
     'user_hidden_card_value': [],
@@ -36,7 +36,6 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolum
   });
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
-
 
   // setup WebSocket 
   const setUp = useCallback(() => {
@@ -91,7 +90,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolum
   }
 
   function submitName(event: FormEvent<HTMLFormElement>) {
-    submitNameAndStartGame(event, dispatch, state, setMessageQueue, backgroundMusicPlaying, setBackgroundMusicPlaying)
+    submitNameAndStartGame(event, dispatch, state, setMessageQueue, backgroundMusicPlaying)
   }
 
   function takeACard() {
