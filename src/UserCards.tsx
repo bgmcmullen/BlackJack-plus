@@ -5,9 +5,9 @@ import Card from "./Card";
 const UserCards: React.FC<{ cards: CardsState }> = ({ cards }) => {
   return (
     <div className="card-container">
-      {cards.user_hidden_card_value.map(card => {
+      {cards.user_hidden_card_value.map((card, index) => {
         return (
-          <Card card={card} appearance="card-animated"/>
+          <Card key={`user_hidden_card_value ${index}`} card={card} appearance="card-animated"/>
         )
       })}
 
@@ -15,7 +15,7 @@ const UserCards: React.FC<{ cards: CardsState }> = ({ cards }) => {
         return (
 
           // Set first card to paused animation
-          <Card card={card} appearance={`${index === 0 ? 'card-paused' : 'card-animated'}`}/>
+          <Card key={`user_visible_card_total_value ${index}`} card={card} appearance={`${index === 0 ? 'card-paused' : 'card-animated'}`}/>
         )
       })
       }

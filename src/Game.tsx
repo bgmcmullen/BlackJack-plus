@@ -141,19 +141,17 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
               </Typography>
 
               <Typography style={{ display: "flex", justifyContent: "center" }} id="modal-modal-description" sx={{ mt: 2 }}>
-                <Typography style={{ fontSize: "20px", marginRight: "10px" }} id="modal-modal-title" variant="h6" component="h2">
-                  Name:
-                </Typography>
-                <form onSubmit={submitName}>
 
-                  <input type="text" placeholder="Enter Your Name" onChange={changeName}></input>
-                  <Button style={{ display: "block" }} type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
-                    Start Game
-                  </Button>
-                </form>
 
               </Typography>
-              <Box sx={{ width: 200 }}>
+              <form onSubmit={submitName}>
+                <label>Name: </label>
+                <input style={{ display: "block", height: "30px"}}type="text" placeholder="Enter Your Name" onChange={changeName}></input>
+                <Button style={{ display: "block", marginTop: "20px"}} type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
+                  Start Game
+                </Button>
+              </form>
+              <Box style={{ marginTop: "20px" }} sx={{ width: 200 }}>
                 <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
                   <VolumeDown />
                   <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />

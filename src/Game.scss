@@ -1,10 +1,8 @@
-input, textarea {
+input,
+textarea {
   font-size: 16px;
 }
 
-input {
-  display: block;
-}
 
 .card-labels {
   background-color: #c9b15a;
@@ -18,6 +16,7 @@ input {
 form {
   display: flex;
   justify-content: center;
+  flex-direction: column;
 }
 
 .welcome-text {
@@ -40,9 +39,9 @@ form {
   right: 20px;
   background-color: red;
   background-image: linear-gradient(45deg, red 25%, transparent 25%),
-      linear-gradient(-45deg, red 25%, transparent 25%),
-      linear-gradient(45deg, lightcoral 25%, transparent 25%),
-      linear-gradient(-45deg, lightcoral 25%, transparent 25%);
+    linear-gradient(-45deg, red 25%, transparent 25%),
+    linear-gradient(45deg, lightcoral 25%, transparent 25%),
+    linear-gradient(-45deg, lightcoral 25%, transparent 25%);
   background-size: 20px 20px;
   background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
   border-radius: 10px;
@@ -50,5 +49,5 @@ form {
   width: 80px;
   height: 120px;
   box-shadow:
-      4px 4px 7px rgba(0, 0, 0, 0.6)
+    4px 4px 7px rgba(0, 0, 0, 0.6)
 }
