@@ -43,6 +43,7 @@ img {
   background: linear-gradient(90deg, #232171 0.03%, #272731 130.83%);
   box-shadow: 8px 8px 4px rgba(0, 0, 0, .75);
   z-index: 5;
+  cursor: pointer;
 }
 
 .start-button::before {

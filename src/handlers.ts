@@ -61,6 +61,8 @@ export function submitNameAndStartGame(
   // Show game control buttons
   dispatch({ type: "SET_GAME_BUTTONS_DISABLED", payload: false });
 
+  dispatch({ type: "SET_SHOW_NAME_INPUT", payload: false});
+
   // Submit name to server
   const nameMessage = JSON.stringify({
     type: "set_name",

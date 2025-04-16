@@ -18,6 +18,24 @@ import setDeckAnimation from './setDeckAnimation';
 import setUpWebSocket from './setUpWebSocket';
 import UserCards from './UserCards';
 import ComputerCards from './ComputerCards';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: "var(--stroke-weight-1, 1px) solid var(--theme-input, #E2E8F0)",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "40px",
+  background: "var(--theme-background, #FFF)"
+};
+
+
 
 import './Game.scss';
 
@@ -27,7 +45,7 @@ const API_URL: string | URL = import.meta.env.VITE_API_URL
 const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
 const dealSound = new Audio('./assets/sounds/deal.wav');
 
-const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolumeChange }) => {
+const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
   const [cards, setCards] = useState<CardsState>(JSON.parse(localStorage.getItem("Blackjack_Cards") || "") || {
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
@@ -90,7 +108,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolum
   }
 
   function submitName(event: FormEvent<HTMLFormElement>) {
-    submitNameAndStartGame(event, dispatch, state, setMessageQueue, backgroundMusicPlaying)
+    submitNameAndStartGame(event, dispatch, state, setMessageQueue)
   }
 
   function takeACard() {
@@ -103,29 +121,56 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolum
 
   return (
     <>
-    {/* Volume control */}
-      <Box sx={{ width: 200 }}>
-        <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
-          <VolumeDown />
-          <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
-          <VolumeUp />
-        </Stack>
-      </Box>
-
-      <h1>
-        Target Score: {state.targetScore}
-      </h1>
-
-      {/* Name submission */}
       <div>
-        <Button variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>Restart</Button>
-        {state.showNameInput && <form onSubmit={submitName}>
-          <input type="text" placeholder="Enter Your Name" onChange={changeName}></input>
-          <Button type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
-            Submit Name
-          </Button>
-        </form>}
+        <h1>
+          Target Score: {state.targetScore}
+        </h1>
 
+        {/* Name submission */}
+        <div>
+          <Button variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>Restart</Button>
+          <Modal
+            open={state.showNameInput}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+
+              <Typography style={{ fontSize: "30px", marginRight: "10px" }} id="modal-modal-title" variant="h6" component="h2">
+                Target Score: {state.targetScore}
+              </Typography>
+
+              <Typography style={{ display: "flex", justifyContent: "center" }} id="modal-modal-description" sx={{ mt: 2 }}>
+                <Typography style={{ fontSize: "20px", marginRight: "10px" }} id="modal-modal-title" variant="h6" component="h2">
+                  Name:
+                </Typography>
+                <form onSubmit={submitName}>
+
+                  <input type="text" placeholder="Enter Your Name" onChange={changeName}></input>
+                  <Button style={{ display: "block" }} type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
+                    Start Game
+                  </Button>
+                </form>
+
+              </Typography>
+              <Box sx={{ width: 200 }}>
+                <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+                  <VolumeDown />
+                  <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+                  <VolumeUp />
+                </Stack>
+              </Box>
+            </Box>
+          </Modal>
+        </div>
+        {/* Volume control */}
+        <Box sx={{ width: 200 }}>
+          <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+            <VolumeDown />
+            <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+            <VolumeUp />
+          </Stack>
+        </Box>
 
         <div>
           {/* Welcome text */}
@@ -135,7 +180,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, volume, handleVolum
           {state.name && <p className='card-labels'>{`${state.name}'s cards:`}</p>}
 
           {/* User cards */}
-          <UserCards cards={cards}/>
+          <UserCards cards={cards} />
 
           {/* Computer card label */}
           {state.name && <p className='card-labels'>Computer's cards:</p>}
