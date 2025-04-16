@@ -1,0 +1,36 @@
+.button-container {
+  display: flex;
+  justify-content: center;
+}
+
+
+.start-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  padding: 27px 117px;
+  align-items: center;
+  gap: 10px;
+  border-radius: 40px;
+  background: linear-gradient(90deg, #232171 0.03%, #272731 130.83%);
+  box-shadow: 0px 0px 5.7px 0px rgba(0, 0, 0, 0.25);
+}
+
+.start-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #5350b7 0.03%, #5e5e72 130.83%);
+  opacity: 0;
+  transition: opacity 0.18s;
+  z-index: 0;
+}
+
+.start-button:hover::before {
+  opacity: 1;
+}
+
+.start-button > * {
+  position: relative;
+  z-index: 1;
+}

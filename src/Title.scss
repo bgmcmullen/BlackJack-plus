@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inknut+Antiqua:wght@700&display=swap');
+
+.main-title-text {
+  position: absolute;
+  font-size: clamp(32px, 15vw, 128px);
+  font-weight: 700;
+  font-family: "Inknut Antiqua";
+}
+
+#sparkle-large {
+  position: absolute;
+  object-fit: cover;
+  z-index: 2;
+  pointer-events: none;
+  top: 0.58em;
+  left: -.3em; 
+  width: .75em;
+  height: .75em;
+  object-fit: contain;
+}
+
+
+
+#sparkle {
+  position: absolute;
+  object-fit: cover;
+  z-index: 2;
+  pointer-events: none;
+  top: 1em;
+  right: .4em;
+  width: .38em;
+  height: .38em;
+
+}
+
+.title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+  
+}
+
+.main-title-div {
+  height: 500px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.shadow-only {
+  color: #ff0800;
+  text-shadow: 8px 8px 4px rgba(0, 0, 0, .75);
+  z-index: 1;
+}
+
+.image-fill {
+  color: #ff080055;
+  background: url('/assets/images/title-background.png') no-repeat center;
+  background-size: cover;
+  -webkit-background-clip: text;
+  z-index: 2;
+}
