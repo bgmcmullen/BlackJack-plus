@@ -46,7 +46,7 @@ const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
 const dealSound = new Audio('./assets/sounds/deal.wav');
 
 const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
-  const [cards, setCards] = useState<CardsState>(JSON.parse(localStorage.getItem("Blackjack_Cards") || "") || {
+  const [cards, setCards] = useState<CardsState>({
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
     'user_hidden_card_value': [],
