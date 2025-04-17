@@ -185,7 +185,7 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
                 <Button id='button' variant="contained" onClick={takeACard} disabled={state.gameButtonsDisabled}>Hit</Button>
 
                 <div style={{ display: "flex", flexDirection: "row" }}>
-                  <img style={{ position: "static", width: "50px" }} src="public/assets/images/trophy.svg" />
+                  <img style={{ position: "static", width: "50px" }} src="/assets/images/trophy.svg" />
                   <h1>
                     Target Score: {state.targetScore}
                   </h1>
