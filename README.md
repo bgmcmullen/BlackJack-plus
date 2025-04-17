@@ -7,6 +7,22 @@
 
 ---
 
+![Screenshot of Blackjack+ gameplay](public/assets/images/screenshot1.png)
+![Screenshot of Blackjack+ gameplay](public/assets/images/screenshot2.png)
+
+---
+## ⚙️ Technical Overview
+
+### 🧱 Tech Stack
+- **Frontend**: React + TypeScript + Material UI
+- **Backend**: Django + Django Channels (for real-time WebSocket communication)
+- **AI Model**: PyTorch model trained to simulate computer opponent logic
+
+### 🤖 AI Logic
+The computer dealer uses a **PyTorch-based model** trained on simulated Blackjack+ scenarios to make decisions during gameplay. To simulate human-like behavior, the AI plays faster when it’s more confident in its decision, and slower when it’s uncertain
+
+---
+
 ## 🔢 How to Play
 
 ### 🎯 Starting the Round
