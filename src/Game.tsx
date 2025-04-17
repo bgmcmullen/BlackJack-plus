@@ -99,8 +99,14 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.deckCoordinates]);
 
+  useEffect(() => {
+    if(state.showNameInput) {
+      playSound(shuffleSound);
+    }
+  }, [state.showNameInput])
+
   function restart() {
-    handleRestart(state, playSound, dispatch, setCards, setUp, shuffleSound, reset);
+    handleRestart(state, playSound, dispatch, setCards, setUp, reset);
   }
 
   function changeName(event: ChangeEvent<HTMLInputElement>) {
@@ -122,20 +128,13 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
   return (
     <>
       <div>
-        <h1>
-          Target Score: {state.targetScore}
-        </h1>
-
-        {/* Name submission */}
         <div>
-          <Button variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>Restart</Button>
           <Modal
             open={state.showNameInput}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
             <Box sx={style}>
-
               <Typography style={{ fontSize: "30px", marginRight: "10px" }} id="modal-modal-title" variant="h6" component="h2">
                 Target Score: {state.targetScore}
               </Typography>
@@ -146,15 +145,16 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
               </Typography>
               <form onSubmit={submitName}>
                 <label>Name: </label>
-                <input style={{ display: "block", height: "30px"}}type="text" placeholder="Enter Your Name" onChange={changeName}></input>
-                <Button style={{ display: "block", marginTop: "20px"}} type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
+                <input style={{ display: "block", height: "30px" }} type="text" placeholder="Enter Your Name" onChange={changeName}></input>
+                <Button style={{ display: "block", marginTop: "20px" }} type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
                   Start Game
                 </Button>
               </form>
-              <Box style={{ marginTop: "20px" }} sx={{ width: 200 }}>
+              <Box style={{ marginTop: "20px", display: "flex"}} sx={{ width: 200 }}>
+                <p style={{fontSize: '12px'}}>Music Volume:</p>
                 <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
                   <VolumeDown />
-                  <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+                  <Slider style={{width: "100px"}}aria-label="Volume" value={volume} onChange={handleVolumeChange} />
                   <VolumeUp />
                 </Stack>
               </Box>
@@ -162,46 +162,63 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
           </Modal>
         </div>
         {/* Volume control */}
-        <Box sx={{ width: 200 }}>
-          <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
-            <VolumeDown />
-            <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
-            <VolumeUp />
-          </Stack>
-        </Box>
 
-        <div>
-          {/* Welcome text */}
-          {state.welcomeText && <p className='welcome-text'>{state.welcomeText}</p>}
+        {!state.showNameInput ?
+          <>
+            <Box style={{ position: "fixed", bottom: "10px", width: "400px" }} sx={{ width: 200 }}>
+              <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+              <p style={{fontSize: '16px'}}>Music Volume:</p>
+                <VolumeDown />
+                <Slider style={{width: "100px"}} aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+                <VolumeUp />
+              </Stack>
+            </Box>
 
-          {/* User card label */}
-          {state.name && <p className='card-labels'>{`${state.name}'s cards:`}</p>}
+            <div className='game-container'>
 
-          {/* User cards */}
-          <UserCards cards={cards} />
+              {/* User card label */}
+              {state.name && <p className='card-labels'>{`${state.name}'s cards:`}</p>}
 
-          {/* Computer card label */}
-          {state.name && <p className='card-labels'>Computer's cards:</p>}
+              {/* User cards */}
+              <UserCards cards={cards} />
+              <div className='middle-container'>
+                <Button id='button' variant="contained" onClick={takeACard} disabled={state.gameButtonsDisabled}>Hit</Button>
 
-          {/* Computer cards */}
-          <ComputerCards cards={cards} gameOver={state.gameOver} />
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                  <img style={{ position: "static", width: "50px" }} src="public/assets/images/trophy.svg" />
+                  <h1>
+                    Target Score: {state.targetScore}
+                  </h1>
+                </div>
+                <Button id='button' variant="contained" onClick={stand} disabled={state.gameButtonsDisabled}>Stand</Button>
+              </div>
 
-          {/* Display deck */}
-          <div className="deck" id="deck">
-            {state.deckCoordinates}
-          </div>
+              {/* Computer card label */}
+              {state.name && <p className='card-labels'>Computer's cards:</p>}
 
+              {/* Computer cards */}
+              <ComputerCards cards={cards} gameOver={state.gameOver} />
+
+
+            </div>
+            {/* Game control buttons */}
+
+            {/* Winner text */}
+            {state.winnerText.length > 0 && <p className='card-labels'>{state.winnerText.map(line => <p>{line}</p>)}</p>}
+            <Button style={{
+              width: "250px",
+              height: "70px",
+              position: "fixed",
+              bottom: "10px",
+              left: "50%",
+              transform: "translateX(-50%)"
+            }} variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>New Game</Button>
+          </> : null}
+        {/* Display deck */}
+        <div className="deck" id="deck">
+          {state.deckCoordinates}
         </div>
-
-        {/* Game control buttons */}
-        <div>
-          <Button id='button' variant="contained" onClick={takeACard} disabled={state.gameButtonsDisabled}>Hit</Button>
-          <Button id='button' variant="contained" onClick={stand} disabled={state.gameButtonsDisabled}>Stand</Button>
-        </div>
-
-        {/* Winner text */}
-        {state.winnerText.length > 0 && <p className='card-labels'>{state.winnerText.map(line => <p>{line}</p>)}</p>}
-      </div>
+      </div >
     </>
   )
 }

@@ -6,6 +6,8 @@ $deal-delay-step: .05s;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
 
 /* Base card style*/

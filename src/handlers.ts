@@ -17,11 +17,10 @@ export function handleRestart(
   dispatch: Dispatch<Action>,
   setCards: React.Dispatch<React.SetStateAction<CardsState>>,
   setUp: () => void,
-  shuffleSound: HTMLAudioElement,
   reset: (dispatch: Dispatch<Action>, setCards: React.Dispatch<React.SetStateAction<CardsState>>) => void
 ) {
   state.socket?.close();
-  playSound(shuffleSound);
+  console.log("shuffleSound");
   createDeckCoordinates(dispatch);
   reset(dispatch, setCards);
   setUp();

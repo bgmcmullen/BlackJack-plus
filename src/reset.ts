@@ -29,7 +29,7 @@ function reset(dispatch: React.Dispatch<Action>, setCards: React.Dispatch<React.
       gameButtonsDisabled: true,
       nameButtonDisabled: false,
       name: '',
-      showNameInput: false,
+      showNameInput: true,
       welcomeText: '',
       winnerText: [],
       gameOver: false,

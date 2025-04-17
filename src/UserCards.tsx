@@ -1,5 +1,6 @@
 import CardsState from "./CardsState";
 import Card from "./Card";
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 const UserCards: React.FC<{ cards: CardsState }> = ({ cards }) => {

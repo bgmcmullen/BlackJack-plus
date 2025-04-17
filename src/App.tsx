@@ -17,6 +17,7 @@ function App() {
 
   return (
     <>
+      <div className="overlay-gradient"></div>
       {!gameStarted ? <SplashScreen setGameStarted={setGameStarted} setBackgroundMusicPlaying={setBackgroundMusicPlaying} /> :
         <>
           <Game backgroundMusicPlaying={backgroundMusicPlaying} volume={volume} handleVolumeChange={handleVolumeChange} />

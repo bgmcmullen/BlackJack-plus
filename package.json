@@ -15,12 +15,16 @@
     "@mui/icons-material": "^6.1.7",
     "@mui/material": "^6.1.2",
     "axios": "^1.7.7",
+    "canvas-confetti": "^1.9.3",
+    "install": "^0.13.0",
+    "npm": "^11.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tone": "^15.0.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^22.7.7",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
