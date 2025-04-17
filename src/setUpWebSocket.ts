@@ -57,12 +57,9 @@ function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL,
   // Handle the open event and enable sending messages
   socketInstance.addEventListener('open', () => {
     dispatch({ type: 'SET_SOCKET_OPEN', payload: true });
-    console.log('WebSocket connection opened.');
   });
 
-  socketInstance.addEventListener('close', () => {
-    console.log('WebSocket connection closed.');
-  });
+
 
   dispatch({ type: 'SET_SOCKET', payload: socketInstance }); // Store WebSocket instance
 
