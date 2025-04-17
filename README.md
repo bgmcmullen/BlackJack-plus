@@ -7,12 +7,8 @@
 
 ---
 
-<table>
-  <tr>
-    <td align="center"><img src="./assets/screenshot1.png" width="250px"/><br/>Player Turn</td>
-    <td align="center"><img src="./assets/screenshot2.png" width="250px"/><br/>Dealer Thinking</td>
-  </tr>
-</table>
+![Screenshot of Blackjack+ gameplay](public/assets/images/screenshot1.png)
+![Screenshot of Blackjack+ gameplay](public/assets/images/screenshot2.png)
 
 ---
 ## ⚙️ Technical Overview
