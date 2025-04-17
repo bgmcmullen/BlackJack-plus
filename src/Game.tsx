@@ -138,10 +138,9 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
               <Typography style={{ fontSize: "30px", marginRight: "10px" }} id="modal-modal-title" variant="h6" component="h2">
                 Target Score: {state.targetScore}
               </Typography>
-
-              <Typography style={{ display: "flex", justifyContent: "center" }} id="modal-modal-description" sx={{ mt: 2 }}>
-
-
+            
+              <Typography style={{ display: "flex", justifyContent: "center", fontFamily: "'Bebas Neue', sans-serif", marginBottom: "10px" }} id="modal-modal-description" sx={{ mt: 2 }}>
+              Blackjack+ is a twist on classic blackjack. The goal is to get as close as possible to the target score without going over. Unlike traditional blackjack, the target score changes each round!
               </Typography>
               <form onSubmit={submitName}>
                 <label>Name: </label>
@@ -203,8 +202,8 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
             </div>
             {/* Game control buttons */}
 
-            {/* Winner text */}
-            {state.winnerText.length > 0 && <p className='card-labels'>{state.winnerText.map(line => <p>{line}</p>)}</p>}
+            {/* Winner text */}s
+            {state.winnerText.length > 0 && <div className='card-labels'>{state.winnerText.map((line, index) => <p key={`line ${index}`}>{line}</p>)}</div>}
             <Button style={{
               width: "250px",
               height: "70px",
