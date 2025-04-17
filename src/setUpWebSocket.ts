@@ -4,6 +4,10 @@ import dealCards from "./dealCards";
 import CardsState from "./CardsState";
 import { handleGetTargetScore } from "./handlers";
 import playSound from "./playSound";
+import confetti from 'canvas-confetti';
+
+
+
 
 const winnerSound = new Audio('./assets/sounds/Winning-sound.wav');
 
@@ -42,8 +46,10 @@ function setUpWebSocket(dispatch: React.Dispatch<Action>, API_URL: string | URL,
         });
 
         // If user won play winning fanfare
-        if (payload.winner === 'user')
+        if (payload.winner === 'user') {
           playSound(winnerSound);
+          confetti();
+        }
         break;
     }
   }

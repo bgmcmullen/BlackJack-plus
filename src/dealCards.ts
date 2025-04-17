@@ -18,6 +18,8 @@ function dealCards(newCards: CardsState, setCards: React.Dispatch<React.SetState
     ) {
       playSound(dealSound, 400);
     }
+
+    localStorage.setItem("Blackjack_Cards", JSON.stringify(newCards));
     
     // Set new card deck
     return newCards;

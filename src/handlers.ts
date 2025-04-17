@@ -5,23 +5,17 @@ import Action from "./Action";
 import CardsState from "./CardsState";
 import createDeckCoordinates from './createDeckCoordinates';
 
-interface PlaySoundFunction {
-  (sound: HTMLAudioElement, delay?: number): void;
-}
-
 type StateType = typeof initialState;
 
 export function handleRestart(
   state: StateType,
-  playSound: PlaySoundFunction,
   dispatch: Dispatch<Action>,
   setCards: React.Dispatch<React.SetStateAction<CardsState>>,
   setUp: () => void,
-  shuffleSound: HTMLAudioElement,
   reset: (dispatch: Dispatch<Action>, setCards: React.Dispatch<React.SetStateAction<CardsState>>) => void
 ) {
   state.socket?.close();
-  playSound(shuffleSound);
+  console.log("shuffleSound");
   createDeckCoordinates(dispatch);
   reset(dispatch, setCards);
   setUp();
@@ -51,19 +45,17 @@ export function submitNameAndStartGame(
   dispatch: Dispatch<Action>,
   state: StateType,
   setMessageQueue: React.Dispatch<React.SetStateAction<string[]>>,
-  backgroundMusicPlaying: boolean,
-  setBackgroundMusicPlaying: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   event.preventDefault();
 
-  // Start background music (if not already playing)
-  if (!backgroundMusicPlaying) setBackgroundMusicPlaying(true);
 
   // Hide submit name button
   dispatch({ type: "SET_NAME_BUTTON_DISABLED", payload: true });
 
   // Show game control buttons
   dispatch({ type: "SET_GAME_BUTTONS_DISABLED", payload: false });
+
+  dispatch({ type: "SET_SHOW_NAME_INPUT", payload: false});
 
   // Submit name to server
   const nameMessage = JSON.stringify({

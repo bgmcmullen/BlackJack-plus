@@ -1,7 +1,16 @@
+
 body {
     font-family: Arial,
         sans-serif;
-    background-color: #167916;
-    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.4) 20%, transparent 10%);
-    background-size: 10px 10px;
+    background-image: url("public/assets/images/Slide1.png")
+}
+
+.overlay-gradient {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(
+    rgba(199, 215, 165, 0.296),
+    rgba(255, 255, 255, 0)
+  );
+  z-index: -1;
 }

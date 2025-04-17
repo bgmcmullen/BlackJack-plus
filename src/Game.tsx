@@ -18,6 +18,24 @@ import setDeckAnimation from './setDeckAnimation';
 import setUpWebSocket from './setUpWebSocket';
 import UserCards from './UserCards';
 import ComputerCards from './ComputerCards';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: "var(--stroke-weight-1, 1px) solid var(--theme-input, #E2E8F0)",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "40px",
+  background: "var(--theme-background, #FFF)"
+};
+
+
 
 import './Game.scss';
 
@@ -27,8 +45,8 @@ const API_URL: string | URL = import.meta.env.VITE_API_URL
 const shuffleSound = new Audio('./assets/sounds/shuffle.wav');
 const dealSound = new Audio('./assets/sounds/deal.wav');
 
-const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicPlaying, volume, handleVolumeChange }) => {
-  const [cards, setCards] = useState<CardsState>({
+const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
+  const [cards, setCards] = useState<CardsState>(JSON.parse(localStorage.getItem("Blackjack_Cards") || "") || {
     'computer_hidden_card_value': [],
     'computer_visible_card_total_values': [],
     'user_hidden_card_value': [],
@@ -36,7 +54,6 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   });
   const [messageQueue, setMessageQueue] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
-
 
   // setup WebSocket 
   const setUp = useCallback(() => {
@@ -82,8 +99,14 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.deckCoordinates]);
 
+  useEffect(() => {
+    if(state.showNameInput) {
+      playSound(shuffleSound);
+    }
+  }, [state.showNameInput])
+
   function restart() {
-    handleRestart(state, playSound, dispatch, setCards, setUp, shuffleSound, reset);
+    handleRestart(state, dispatch, setCards, setUp, reset);
   }
 
   function changeName(event: ChangeEvent<HTMLInputElement>) {
@@ -91,7 +114,7 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
   }
 
   function submitName(event: FormEvent<HTMLFormElement>) {
-    submitNameAndStartGame(event, dispatch, state, setMessageQueue, backgroundMusicPlaying, setBackgroundMusicPlaying)
+    submitNameAndStartGame(event, dispatch, state, setMessageQueue)
   }
 
   function takeACard() {
@@ -104,62 +127,98 @@ const Game: React.FC<GameProps> = ({ backgroundMusicPlaying, setBackgroundMusicP
 
   return (
     <>
-    {/* Volume control */}
-      <Box sx={{ width: 200 }}>
-        <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
-          <VolumeDown />
-          <Slider aria-label="Volume" value={volume} onChange={handleVolumeChange} />
-          <VolumeUp />
-        </Stack>
-      </Box>
-
-      <h1>
-        Target Score: {state.targetScore}
-      </h1>
-
-      {/* Name submission */}
       <div>
-        <Button variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>Restart</Button>
-        {state.showNameInput && <form onSubmit={submitName}>
-          <input type="text" placeholder="Enter Your Name" onChange={changeName}></input>
-          <Button type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
-            Submit Name
-          </Button>
-        </form>}
-
-
         <div>
-          {/* Welcome text */}
-          {state.welcomeText && <p className='welcome-text'>{state.welcomeText}</p>}
+          <Modal
+            open={state.showNameInput}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography style={{ fontSize: "30px", marginRight: "10px" }} id="modal-modal-title" variant="h6" component="h2">
+                Target Score: {state.targetScore}
+              </Typography>
 
-          {/* User card label */}
-          {state.name && <p className='card-labels'>{`${state.name}'s cards:`}</p>}
+              <Typography style={{ display: "flex", justifyContent: "center" }} id="modal-modal-description" sx={{ mt: 2 }}>
 
-          {/* User cards */}
-          <UserCards cards={cards}/>
 
-          {/* Computer card label */}
-          {state.name && <p className='card-labels'>Computer's cards:</p>}
-
-          {/* Computer cards */}
-          <ComputerCards cards={cards} gameOver={state.gameOver} />
-
-          {/* Display deck */}
-          <div className="deck" id="deck">
-            {state.deckCoordinates}
-          </div>
-
+              </Typography>
+              <form onSubmit={submitName}>
+                <label>Name: </label>
+                <input style={{ display: "block", height: "30px" }} type="text" placeholder="Enter Your Name" onChange={changeName}></input>
+                <Button style={{ display: "block", marginTop: "20px" }} type="submit" variant="contained" color="primary" disabled={state.nameButtonDisabled}>
+                  Start Game
+                </Button>
+              </form>
+              <Box style={{ marginTop: "20px", display: "flex"}} sx={{ width: 200 }}>
+                <p style={{fontSize: '12px'}}>Music Volume:</p>
+                <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+                  <VolumeDown />
+                  <Slider style={{width: "100px"}}aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+                  <VolumeUp />
+                </Stack>
+              </Box>
+            </Box>
+          </Modal>
         </div>
+        {/* Volume control */}
 
-        {/* Game control buttons */}
-        <div>
-          <Button id='button' variant="contained" onClick={takeACard} disabled={state.gameButtonsDisabled}>Hit</Button>
-          <Button id='button' variant="contained" onClick={stand} disabled={state.gameButtonsDisabled}>Stand</Button>
+        {!state.showNameInput ?
+          <>
+            <Box style={{ position: "fixed", bottom: "10px", width: "400px" }} sx={{ width: 200 }}>
+              <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
+              <p style={{fontSize: '16px'}}>Music Volume:</p>
+                <VolumeDown />
+                <Slider style={{width: "100px"}} aria-label="Volume" value={volume} onChange={handleVolumeChange} />
+                <VolumeUp />
+              </Stack>
+            </Box>
+
+            <div className='game-container'>
+
+              {/* User card label */}
+              {state.name && <p className='card-labels'>{`${state.name}'s cards:`}</p>}
+
+              {/* User cards */}
+              <UserCards cards={cards} />
+              <div className='middle-container'>
+                <Button id='button' variant="contained" onClick={takeACard} disabled={state.gameButtonsDisabled}>Hit</Button>
+
+                <div style={{ display: "flex", flexDirection: "row" }}>
+                  <img style={{ position: "static", width: "50px" }} src="public/assets/images/trophy.svg" />
+                  <h1>
+                    Target Score: {state.targetScore}
+                  </h1>
+                </div>
+                <Button id='button' variant="contained" onClick={stand} disabled={state.gameButtonsDisabled}>Stand</Button>
+              </div>
+
+              {/* Computer card label */}
+              {state.name && <p className='card-labels'>Computer's cards:</p>}
+
+              {/* Computer cards */}
+              <ComputerCards cards={cards} gameOver={state.gameOver} />
+
+
+            </div>
+            {/* Game control buttons */}
+
+            {/* Winner text */}
+            {state.winnerText.length > 0 && <p className='card-labels'>{state.winnerText.map(line => <p>{line}</p>)}</p>}
+            <Button style={{
+              width: "250px",
+              height: "70px",
+              position: "fixed",
+              bottom: "10px",
+              left: "50%",
+              transform: "translateX(-50%)"
+            }} variant="contained" onClick={restart} disabled={state.restartButtonDisabled}>New Game</Button>
+          </> : null}
+        {/* Display deck */}
+        <div className="deck" id="deck">
+          {state.deckCoordinates}
         </div>
-
-        {/* Winner text */}
-        {state.winnerText.length > 0 && <p className='card-labels'>{state.winnerText.map(line => <p>{line}</p>)}</p>}
-      </div>
+      </div >
     </>
   )
 }
