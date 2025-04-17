@@ -5,15 +5,10 @@ import Action from "./Action";
 import CardsState from "./CardsState";
 import createDeckCoordinates from './createDeckCoordinates';
 
-interface PlaySoundFunction {
-  (sound: HTMLAudioElement, delay?: number): void;
-}
-
 type StateType = typeof initialState;
 
 export function handleRestart(
   state: StateType,
-  playSound: PlaySoundFunction,
   dispatch: Dispatch<Action>,
   setCards: React.Dispatch<React.SetStateAction<CardsState>>,
   setUp: () => void,

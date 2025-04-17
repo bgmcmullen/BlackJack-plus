@@ -106,7 +106,7 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
   }, [state.showNameInput])
 
   function restart() {
-    handleRestart(state, playSound, dispatch, setCards, setUp, reset);
+    handleRestart(state, dispatch, setCards, setUp, reset);
   }
 
   function changeName(event: ChangeEvent<HTMLInputElement>) {
