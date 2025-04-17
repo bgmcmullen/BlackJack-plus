@@ -167,7 +167,7 @@ const Game: React.FC<GameProps> = ({ volume, handleVolumeChange }) => {
           <>
             <Box style={{ position: "fixed", bottom: "10px", width: "400px" }} sx={{ width: 200 }}>
               <Stack spacing={2} direction="row" sx={{ alignItems: 'center', mb: 1 }}>
-              <p style={{fontSize: '16px'}}>Music Volume:</p>
+              <p style={{fontSize: '16px', color: "white"}}>Music Volume:</p>
                 <VolumeDown />
                 <Slider style={{width: "100px"}} aria-label="Volume" value={volume} onChange={handleVolumeChange} />
                 <VolumeUp />
